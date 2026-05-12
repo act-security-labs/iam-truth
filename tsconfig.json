@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "module": "ES2020",
+    "moduleResolution": "node",
+    "target": "es2022",
+    "outDir": "dist",
+    "rootDir": "src",
+    "sourceMap": true,
+    "strict": true,
+    "declaration": true,
+    "declarationMap": true,
+    "lib": ["es2023", "DOM"],
+    "noUnusedLocals": true,
+    "noUnusedParameters": false,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitOverride": true,
+    "isolatedModules": true,
+    "verbatimModuleSyntax": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true
+  },
+  "exclude": ["tests", "test", "dist", "bin", "**/bin", "**/dist", "node_modules", "cdk.out"]
+}

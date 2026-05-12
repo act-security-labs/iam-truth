@@ -1,0 +1,398 @@
+{
+  "description": "Global condition keys in network category",
+  "cases": [
+    {
+      "name": "global condition key aws:SourceIp",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Deny",
+              "Action": "s3:PutObject",
+              "Resource": "*",
+              "Condition": {
+                "IpAddressIfExists": {
+                  "aws:SourceIp": "203.0.113.0/24"
+                }
+              }
+            }
+          ]
+        },
+        "request": {
+          "action": "s3:PutObject"
+        },
+        "options": {
+          "maxRows": 1000
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "columns": [
+            {
+              "key": "aws:SourceIp",
+              "label": "aws:SourceIp",
+              "valueType": "ip"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            ["203.0.113.10", "explicitlyDenied"],
+            ["198.51.100.10", "notDenied"],
+            [null, "explicitlyDenied"]
+          ]
+        }
+      }
+    },
+    {
+      "name": "global condition key aws:SourceVpc",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Deny",
+              "Action": "s3:PutObject",
+              "Resource": "*",
+              "Condition": {
+                "StringEqualsIfExists": {
+                  "aws:SourceVpc": "cloud-copilot-example-value"
+                }
+              }
+            }
+          ]
+        },
+        "request": {
+          "action": "s3:PutObject"
+        },
+        "options": {
+          "maxRows": 1000
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "columns": [
+            {
+              "key": "aws:SourceVpc",
+              "label": "aws:SourceVpc",
+              "valueType": "string"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            ["cloud-copilot-example-value", "explicitlyDenied"],
+            ["cloud-copilot-other-value", "notDenied"],
+            [null, "explicitlyDenied"]
+          ]
+        }
+      }
+    },
+    {
+      "name": "global condition key aws:SourceVpcArn",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Deny",
+              "Action": "s3:PutObject",
+              "Resource": "*",
+              "Condition": {
+                "StringEqualsIfExists": {
+                  "aws:SourceVpcArn": "cloud-copilot-example-value"
+                }
+              }
+            }
+          ]
+        },
+        "request": {
+          "action": "s3:PutObject"
+        },
+        "options": {
+          "maxRows": 1000
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "columns": [
+            {
+              "key": "aws:SourceVpcArn",
+              "label": "aws:SourceVpcArn",
+              "valueType": "string"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            ["cloud-copilot-example-value", "explicitlyDenied"],
+            ["cloud-copilot-other-value", "notDenied"],
+            [null, "explicitlyDenied"]
+          ]
+        }
+      }
+    },
+    {
+      "name": "global condition key aws:SourceVpce",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Deny",
+              "Action": "s3:PutObject",
+              "Resource": "*",
+              "Condition": {
+                "StringEqualsIfExists": {
+                  "aws:SourceVpce": "cloud-copilot-example-value"
+                }
+              }
+            }
+          ]
+        },
+        "request": {
+          "action": "s3:PutObject"
+        },
+        "options": {
+          "maxRows": 1000
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "columns": [
+            {
+              "key": "aws:SourceVpce",
+              "label": "aws:SourceVpce",
+              "valueType": "string"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            ["cloud-copilot-example-value", "explicitlyDenied"],
+            ["cloud-copilot-other-value", "notDenied"],
+            [null, "explicitlyDenied"]
+          ]
+        }
+      }
+    },
+    {
+      "name": "global condition key aws:VpceAccount",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Deny",
+              "Action": "s3:PutObject",
+              "Resource": "*",
+              "Condition": {
+                "StringEqualsIfExists": {
+                  "aws:VpceAccount": "cloud-copilot-example-value"
+                }
+              }
+            }
+          ]
+        },
+        "request": {
+          "action": "s3:PutObject"
+        },
+        "options": {
+          "maxRows": 1000
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "columns": [
+            {
+              "key": "aws:VpceAccount",
+              "label": "aws:VpceAccount",
+              "valueType": "string"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            ["cloud-copilot-example-value", "explicitlyDenied"],
+            ["222222222222", "notDenied"],
+            [null, "explicitlyDenied"]
+          ]
+        }
+      }
+    },
+    {
+      "name": "global condition key aws:VpceOrgPaths",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Deny",
+              "Action": "s3:PutObject",
+              "Resource": "*",
+              "Condition": {
+                "ForAnyValue:StringEqualsIfExists": {
+                  "aws:VpceOrgPaths": ["cloud-copilot-example-value"]
+                }
+              }
+            }
+          ]
+        },
+        "request": {
+          "action": "s3:PutObject"
+        },
+        "options": {
+          "maxRows": 1000
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "columns": [
+            {
+              "key": "aws:VpceOrgPaths",
+              "label": "aws:VpceOrgPaths",
+              "valueType": "string"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            [["o-otherorg/r-root/ou-other/"], "notDenied"],
+            [["cloud-copilot-example-value", "o-otherorg/r-root/ou-other/"], "explicitlyDenied"],
+            [["cloud-copilot-example-value"], "explicitlyDenied"],
+            [null, "notDenied"]
+          ]
+        }
+      }
+    },
+    {
+      "name": "global condition key aws:VpceOrgID",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Deny",
+              "Action": "s3:PutObject",
+              "Resource": "*",
+              "Condition": {
+                "StringEqualsIfExists": {
+                  "aws:VpceOrgID": "cloud-copilot-example-value"
+                }
+              }
+            }
+          ]
+        },
+        "request": {
+          "action": "s3:PutObject"
+        },
+        "options": {
+          "maxRows": 1000
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "columns": [
+            {
+              "key": "aws:VpceOrgID",
+              "label": "aws:VpceOrgID",
+              "valueType": "string"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            ["cloud-copilot-example-value", "explicitlyDenied"],
+            ["o-otherorg", "notDenied"],
+            [null, "explicitlyDenied"]
+          ]
+        }
+      }
+    },
+    {
+      "name": "global condition key aws:VpcSourceIp",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Deny",
+              "Action": "s3:PutObject",
+              "Resource": "*",
+              "Condition": {
+                "IpAddressIfExists": {
+                  "aws:VpcSourceIp": "203.0.113.0/24"
+                }
+              }
+            }
+          ]
+        },
+        "request": {
+          "action": "s3:PutObject"
+        },
+        "options": {
+          "maxRows": 1000
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "columns": [
+            {
+              "key": "aws:VpcSourceIp",
+              "label": "aws:VpcSourceIp",
+              "valueType": "ip"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            ["203.0.113.10", "explicitlyDenied"],
+            ["198.51.100.10", "notDenied"],
+            [null, "explicitlyDenied"]
+          ]
+        }
+      }
+    }
+  ]
+}

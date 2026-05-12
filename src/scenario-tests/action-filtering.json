@@ -1,0 +1,177 @@
+{
+  "description": "Condition extraction is scoped to statements that apply to the tested action",
+  "cases": [
+    {
+      "name": "uses inferred first action and ignores conditions from unrelated Action statements",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Sid": "AppliesToPutObject",
+              "Effect": "Deny",
+              "Action": "s3:PutObject",
+              "Resource": "*",
+              "Condition": {
+                "StringEqualsIfExists": {
+                  "aws:ResourceOrgID": "o-example"
+                }
+              }
+            },
+            {
+              "Sid": "DoesNotApplyToPutObject",
+              "Effect": "Deny",
+              "Action": "ec2:StartInstances",
+              "Resource": "*",
+              "Condition": {
+                "StringEqualsIfExists": {
+                  "aws:RequestedRegion": "us-east-1"
+                }
+              }
+            }
+          ]
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "testedAction": "s3:PutObject",
+          "columns": [
+            {
+              "key": "aws:ResourceOrgID",
+              "label": "Organization ID",
+              "valueType": "string"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            ["o-example", "explicitlyDenied"],
+            ["o-otherorg", "notDenied"],
+            [null, "explicitlyDenied"]
+          ]
+        }
+      }
+    },
+    {
+      "name": "uses requested action override and extracts only matching statement conditions",
+      "input": {
+        "policyType": "scp",
+        "request": {
+          "action": "s3:PutObject"
+        },
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Sid": "DoesNotApplyToPutObject",
+              "Effect": "Deny",
+              "Action": "s3:GetObject",
+              "Resource": "*",
+              "Condition": {
+                "StringEqualsIfExists": {
+                  "aws:ResourceOrgID": "o-example"
+                }
+              }
+            },
+            {
+              "Sid": "AppliesToPutObject",
+              "Effect": "Deny",
+              "Action": "s3:PutObject",
+              "Resource": "*",
+              "Condition": {
+                "StringEqualsIfExists": {
+                  "aws:RequestedRegion": "us-east-1"
+                }
+              }
+            }
+          ]
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "testedAction": "s3:PutObject",
+          "columns": [
+            {
+              "key": "aws:RequestedRegion",
+              "label": "aws:RequestedRegion",
+              "valueType": "string"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            ["us-east-1", "explicitlyDenied"],
+            ["cloud-copilot-other-value", "notDenied"]
+          ]
+        }
+      }
+    },
+    {
+      "name": "includes applicable NotAction conditions for the tested action",
+      "input": {
+        "policyType": "scp",
+        "request": {
+          "action": "s3:PutObject"
+        },
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Sid": "NotActionApplies",
+              "Effect": "Deny",
+              "NotAction": "ec2:*",
+              "Resource": "*",
+              "Condition": {
+                "BoolIfExists": {
+                  "aws:SecureTransport": "false"
+                }
+              }
+            },
+            {
+              "Sid": "ActionDoesNotApply",
+              "Effect": "Deny",
+              "Action": "ec2:StartInstances",
+              "Resource": "*",
+              "Condition": {
+                "StringEqualsIfExists": {
+                  "aws:RequestedRegion": "us-east-1"
+                }
+              }
+            }
+          ]
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "testedAction": "s3:PutObject",
+          "columns": [
+            {
+              "key": "aws:SecureTransport",
+              "label": "aws:SecureTransport",
+              "valueType": "boolean"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            [false, "explicitlyDenied"],
+            [true, "notDenied"]
+          ]
+        }
+      }
+    }
+  ]
+}

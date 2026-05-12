@@ -1,0 +1,125 @@
+{
+  "description": "Exclusive condition-key request context combinations",
+  "cases": [
+    {
+      "name": "excludes impossible SourceIp and SourceVpc combinations",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Deny",
+              "Action": "s3:PutObject",
+              "Resource": "*",
+              "Condition": {
+                "IpAddressIfExists": {
+                  "aws:SourceIp": "203.0.113.0/24"
+                },
+                "StringEqualsIfExists": {
+                  "aws:SourceVpc": "vpc-123"
+                }
+              }
+            }
+          ]
+        },
+        "request": {
+          "action": "s3:PutObject"
+        },
+        "options": {
+          "maxRows": 1000
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "columns": [
+            {
+              "key": "aws:SourceIp",
+              "label": "aws:SourceIp",
+              "valueType": "ip"
+            },
+            {
+              "key": "aws:SourceVpc",
+              "label": "aws:SourceVpc",
+              "valueType": "string"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            ["203.0.113.10", null, "explicitlyDenied"],
+            ["198.51.100.10", null, "notDenied"],
+            [null, "vpc-123", "explicitlyDenied"],
+            [null, "cloud-copilot-other-value", "notDenied"],
+            [null, null, "explicitlyDenied"]
+          ]
+        }
+      }
+    },
+    {
+      "name": "allows VPC endpoint keys to coexist without SourceIp",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Deny",
+              "Action": "s3:PutObject",
+              "Resource": "*",
+              "Condition": {
+                "StringEqualsIfExists": {
+                  "aws:SourceVpce": "vpce-123",
+                  "aws:VpceAccount": "111111111111"
+                }
+              }
+            }
+          ]
+        },
+        "request": {
+          "action": "s3:PutObject"
+        },
+        "options": {
+          "maxRows": 1000
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "columns": [
+            {
+              "key": "aws:SourceVpce",
+              "label": "aws:SourceVpce",
+              "valueType": "string"
+            },
+            {
+              "key": "aws:VpceAccount",
+              "label": "aws:VpceAccount",
+              "valueType": "string"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            ["vpce-123", "111111111111", "explicitlyDenied"],
+            ["vpce-123", "222222222222", "notDenied"],
+            ["vpce-123", null, "explicitlyDenied"],
+            ["cloud-copilot-other-value", "111111111111", "notDenied"],
+            ["cloud-copilot-other-value", "222222222222", "notDenied"],
+            ["cloud-copilot-other-value", null, "notDenied"],
+            [null, "111111111111", "explicitlyDenied"],
+            [null, "222222222222", "notDenied"],
+            [null, null, "explicitlyDenied"]
+          ]
+        }
+      }
+    }
+  ]
+}

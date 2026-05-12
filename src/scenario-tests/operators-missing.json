@@ -1,0 +1,1486 @@
+{
+  "description": "Condition operator missing-context scenario coverage",
+  "cases": [
+    {
+      "name": "includes missing scenario for StringEquals",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Deny",
+              "Action": "s3:PutObject",
+              "Resource": "*",
+              "Condition": {
+                "StringEquals": {
+                  "aws:SourceIdentity": "cloud-copilot-example-value"
+                }
+              }
+            }
+          ]
+        },
+        "request": {
+          "action": "s3:PutObject"
+        },
+        "options": {
+          "maxRows": 1000
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "columns": [
+            {
+              "key": "aws:SourceIdentity",
+              "label": "aws:SourceIdentity",
+              "valueType": "string"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            ["cloud-copilot-example-value", "explicitlyDenied"],
+            ["cloud-copilot-other-value", "notDenied"],
+            [null, "notDenied"]
+          ]
+        }
+      }
+    },
+    {
+      "name": "includes missing scenario for StringNotEquals",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Deny",
+              "Action": "s3:PutObject",
+              "Resource": "*",
+              "Condition": {
+                "StringNotEquals": {
+                  "aws:SourceIdentity": "cloud-copilot-example-value"
+                }
+              }
+            }
+          ]
+        },
+        "request": {
+          "action": "s3:PutObject"
+        },
+        "options": {
+          "maxRows": 1000
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "columns": [
+            {
+              "key": "aws:SourceIdentity",
+              "label": "aws:SourceIdentity",
+              "valueType": "string"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            ["cloud-copilot-example-value", "notDenied"],
+            ["cloud-copilot-other-value", "explicitlyDenied"],
+            [null, "explicitlyDenied"]
+          ]
+        }
+      }
+    },
+    {
+      "name": "includes missing scenario for StringEqualsIgnoreCase",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Deny",
+              "Action": "s3:PutObject",
+              "Resource": "*",
+              "Condition": {
+                "StringEqualsIgnoreCase": {
+                  "aws:SourceIdentity": "cloud-copilot-example-value"
+                }
+              }
+            }
+          ]
+        },
+        "request": {
+          "action": "s3:PutObject"
+        },
+        "options": {
+          "maxRows": 1000
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "columns": [
+            {
+              "key": "aws:SourceIdentity",
+              "label": "aws:SourceIdentity",
+              "valueType": "string"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            ["cloud-copilot-example-value", "explicitlyDenied"],
+            ["cloud-copilot-other-value", "notDenied"],
+            [null, "notDenied"]
+          ]
+        }
+      }
+    },
+    {
+      "name": "includes missing scenario for StringNotEqualsIgnoreCase",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Deny",
+              "Action": "s3:PutObject",
+              "Resource": "*",
+              "Condition": {
+                "StringNotEqualsIgnoreCase": {
+                  "aws:SourceIdentity": "cloud-copilot-example-value"
+                }
+              }
+            }
+          ]
+        },
+        "request": {
+          "action": "s3:PutObject"
+        },
+        "options": {
+          "maxRows": 1000
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "columns": [
+            {
+              "key": "aws:SourceIdentity",
+              "label": "aws:SourceIdentity",
+              "valueType": "string"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            ["cloud-copilot-example-value", "notDenied"],
+            ["cloud-copilot-other-value", "explicitlyDenied"],
+            [null, "explicitlyDenied"]
+          ]
+        }
+      }
+    },
+    {
+      "name": "includes missing scenario for StringLike",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Deny",
+              "Action": "s3:PutObject",
+              "Resource": "*",
+              "Condition": {
+                "StringLike": {
+                  "aws:SourceIdentity": "cloud-copilot-*"
+                }
+              }
+            }
+          ]
+        },
+        "request": {
+          "action": "s3:PutObject"
+        },
+        "options": {
+          "maxRows": 1000
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "columns": [
+            {
+              "key": "aws:SourceIdentity",
+              "label": "aws:SourceIdentity",
+              "valueType": "string"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            ["cloud-copilot-example", "explicitlyDenied"],
+            ["not-cloud-copilot-example", "notDenied"],
+            [null, "notDenied"]
+          ]
+        }
+      }
+    },
+    {
+      "name": "includes missing scenario for StringNotLike",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Deny",
+              "Action": "s3:PutObject",
+              "Resource": "*",
+              "Condition": {
+                "StringNotLike": {
+                  "aws:SourceIdentity": "cloud-copilot-*"
+                }
+              }
+            }
+          ]
+        },
+        "request": {
+          "action": "s3:PutObject"
+        },
+        "options": {
+          "maxRows": 1000
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "columns": [
+            {
+              "key": "aws:SourceIdentity",
+              "label": "aws:SourceIdentity",
+              "valueType": "string"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            ["cloud-copilot-example", "notDenied"],
+            ["not-cloud-copilot-example", "explicitlyDenied"],
+            [null, "explicitlyDenied"]
+          ]
+        }
+      }
+    },
+    {
+      "name": "includes missing scenario for NumericEquals",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Deny",
+              "Action": "s3:PutObject",
+              "Resource": "*",
+              "Condition": {
+                "NumericEquals": {
+                  "aws:MultiFactorAuthAge": "5"
+                }
+              }
+            }
+          ]
+        },
+        "request": {
+          "action": "s3:PutObject"
+        },
+        "options": {
+          "maxRows": 1000
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "columns": [
+            {
+              "key": "aws:MultiFactorAuthAge",
+              "label": "aws:MultiFactorAuthAge",
+              "valueType": "number"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            [5, "explicitlyDenied"],
+            [6, "notDenied"],
+            [null, "notDenied"]
+          ]
+        }
+      }
+    },
+    {
+      "name": "includes missing scenario for NumericNotEquals",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Deny",
+              "Action": "s3:PutObject",
+              "Resource": "*",
+              "Condition": {
+                "NumericNotEquals": {
+                  "aws:MultiFactorAuthAge": "5"
+                }
+              }
+            }
+          ]
+        },
+        "request": {
+          "action": "s3:PutObject"
+        },
+        "options": {
+          "maxRows": 1000
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "columns": [
+            {
+              "key": "aws:MultiFactorAuthAge",
+              "label": "aws:MultiFactorAuthAge",
+              "valueType": "number"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            [6, "explicitlyDenied"],
+            [5, "notDenied"],
+            [null, "explicitlyDenied"]
+          ]
+        }
+      }
+    },
+    {
+      "name": "includes missing scenario for NumericLessThan",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Deny",
+              "Action": "s3:PutObject",
+              "Resource": "*",
+              "Condition": {
+                "NumericLessThan": {
+                  "aws:MultiFactorAuthAge": "5"
+                }
+              }
+            }
+          ]
+        },
+        "request": {
+          "action": "s3:PutObject"
+        },
+        "options": {
+          "maxRows": 1000
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "columns": [
+            {
+              "key": "aws:MultiFactorAuthAge",
+              "label": "aws:MultiFactorAuthAge",
+              "valueType": "number"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            [4, "explicitlyDenied"],
+            [5, "notDenied"],
+            [6, "notDenied"],
+            [null, "notDenied"]
+          ]
+        }
+      }
+    },
+    {
+      "name": "includes missing scenario for NumericLessThanEquals",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Deny",
+              "Action": "s3:PutObject",
+              "Resource": "*",
+              "Condition": {
+                "NumericLessThanEquals": {
+                  "aws:MultiFactorAuthAge": "5"
+                }
+              }
+            }
+          ]
+        },
+        "request": {
+          "action": "s3:PutObject"
+        },
+        "options": {
+          "maxRows": 1000
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "columns": [
+            {
+              "key": "aws:MultiFactorAuthAge",
+              "label": "aws:MultiFactorAuthAge",
+              "valueType": "number"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            [4, "explicitlyDenied"],
+            [5, "explicitlyDenied"],
+            [6, "notDenied"],
+            [null, "notDenied"]
+          ]
+        }
+      }
+    },
+    {
+      "name": "includes missing scenario for NumericGreaterThan",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Deny",
+              "Action": "s3:PutObject",
+              "Resource": "*",
+              "Condition": {
+                "NumericGreaterThan": {
+                  "aws:MultiFactorAuthAge": "5"
+                }
+              }
+            }
+          ]
+        },
+        "request": {
+          "action": "s3:PutObject"
+        },
+        "options": {
+          "maxRows": 1000
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "columns": [
+            {
+              "key": "aws:MultiFactorAuthAge",
+              "label": "aws:MultiFactorAuthAge",
+              "valueType": "number"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            [4, "notDenied"],
+            [5, "notDenied"],
+            [6, "explicitlyDenied"],
+            [null, "notDenied"]
+          ]
+        }
+      }
+    },
+    {
+      "name": "includes missing scenario for NumericGreaterThanEquals",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Deny",
+              "Action": "s3:PutObject",
+              "Resource": "*",
+              "Condition": {
+                "NumericGreaterThanEquals": {
+                  "aws:MultiFactorAuthAge": "5"
+                }
+              }
+            }
+          ]
+        },
+        "request": {
+          "action": "s3:PutObject"
+        },
+        "options": {
+          "maxRows": 1000
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "columns": [
+            {
+              "key": "aws:MultiFactorAuthAge",
+              "label": "aws:MultiFactorAuthAge",
+              "valueType": "number"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            [4, "notDenied"],
+            [5, "explicitlyDenied"],
+            [6, "explicitlyDenied"],
+            [null, "notDenied"]
+          ]
+        }
+      }
+    },
+    {
+      "name": "includes missing scenario for DateEquals",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Deny",
+              "Action": "s3:PutObject",
+              "Resource": "*",
+              "Condition": {
+                "DateEquals": {
+                  "aws:TokenIssueTime": "2024-01-01T00:00:00Z"
+                }
+              }
+            }
+          ]
+        },
+        "request": {
+          "action": "s3:PutObject"
+        },
+        "options": {
+          "maxRows": 1000
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "columns": [
+            {
+              "key": "aws:TokenIssueTime",
+              "label": "aws:TokenIssueTime",
+              "valueType": "date"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            ["2024-01-01T00:00:00.000Z", "explicitlyDenied"],
+            ["2024-01-02T00:00:00.000Z", "notDenied"],
+            [null, "notDenied"]
+          ]
+        }
+      }
+    },
+    {
+      "name": "includes missing scenario for DateNotEquals",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Deny",
+              "Action": "s3:PutObject",
+              "Resource": "*",
+              "Condition": {
+                "DateNotEquals": {
+                  "aws:TokenIssueTime": "2024-01-01T00:00:00Z"
+                }
+              }
+            }
+          ]
+        },
+        "request": {
+          "action": "s3:PutObject"
+        },
+        "options": {
+          "maxRows": 1000
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "columns": [
+            {
+              "key": "aws:TokenIssueTime",
+              "label": "aws:TokenIssueTime",
+              "valueType": "date"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            ["2024-01-02T00:00:00.000Z", "explicitlyDenied"],
+            ["2024-01-01T00:00:00.000Z", "notDenied"],
+            [null, "explicitlyDenied"]
+          ]
+        }
+      }
+    },
+    {
+      "name": "includes missing scenario for DateLessThan",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Deny",
+              "Action": "s3:PutObject",
+              "Resource": "*",
+              "Condition": {
+                "DateLessThan": {
+                  "aws:TokenIssueTime": "2024-01-01T00:00:00Z"
+                }
+              }
+            }
+          ]
+        },
+        "request": {
+          "action": "s3:PutObject"
+        },
+        "options": {
+          "maxRows": 1000
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "columns": [
+            {
+              "key": "aws:TokenIssueTime",
+              "label": "aws:TokenIssueTime",
+              "valueType": "date"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            ["2023-12-31T00:00:00.000Z", "explicitlyDenied"],
+            ["2024-01-02T00:00:00.000Z", "notDenied"],
+            [null, "notDenied"]
+          ]
+        }
+      }
+    },
+    {
+      "name": "includes missing scenario for DateLessThanEquals",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Deny",
+              "Action": "s3:PutObject",
+              "Resource": "*",
+              "Condition": {
+                "DateLessThanEquals": {
+                  "aws:TokenIssueTime": "2024-01-01T00:00:00Z"
+                }
+              }
+            }
+          ]
+        },
+        "request": {
+          "action": "s3:PutObject"
+        },
+        "options": {
+          "maxRows": 1000
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "columns": [
+            {
+              "key": "aws:TokenIssueTime",
+              "label": "aws:TokenIssueTime",
+              "valueType": "date"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            ["2023-12-31T00:00:00.000Z", "explicitlyDenied"],
+            ["2024-01-02T00:00:00.000Z", "notDenied"],
+            [null, "notDenied"]
+          ]
+        }
+      }
+    },
+    {
+      "name": "includes missing scenario for DateGreaterThan",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Deny",
+              "Action": "s3:PutObject",
+              "Resource": "*",
+              "Condition": {
+                "DateGreaterThan": {
+                  "aws:TokenIssueTime": "2024-01-01T00:00:00Z"
+                }
+              }
+            }
+          ]
+        },
+        "request": {
+          "action": "s3:PutObject"
+        },
+        "options": {
+          "maxRows": 1000
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "columns": [
+            {
+              "key": "aws:TokenIssueTime",
+              "label": "aws:TokenIssueTime",
+              "valueType": "date"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            ["2024-01-02T00:00:00.000Z", "explicitlyDenied"],
+            ["2023-12-31T00:00:00.000Z", "notDenied"],
+            [null, "notDenied"]
+          ]
+        }
+      }
+    },
+    {
+      "name": "includes missing scenario for DateGreaterThanEquals",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Deny",
+              "Action": "s3:PutObject",
+              "Resource": "*",
+              "Condition": {
+                "DateGreaterThanEquals": {
+                  "aws:TokenIssueTime": "2024-01-01T00:00:00Z"
+                }
+              }
+            }
+          ]
+        },
+        "request": {
+          "action": "s3:PutObject"
+        },
+        "options": {
+          "maxRows": 1000
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "columns": [
+            {
+              "key": "aws:TokenIssueTime",
+              "label": "aws:TokenIssueTime",
+              "valueType": "date"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            ["2024-01-02T00:00:00.000Z", "explicitlyDenied"],
+            ["2023-12-31T00:00:00.000Z", "notDenied"],
+            [null, "notDenied"]
+          ]
+        }
+      }
+    },
+    {
+      "name": "includes missing scenario for Bool",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Deny",
+              "Action": "s3:PutObject",
+              "Resource": "*",
+              "Condition": {
+                "Bool": {
+                  "aws:MultiFactorAuthPresent": "true"
+                }
+              }
+            }
+          ]
+        },
+        "request": {
+          "action": "s3:PutObject"
+        },
+        "options": {
+          "maxRows": 1000
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "columns": [
+            {
+              "key": "aws:MultiFactorAuthPresent",
+              "label": "aws:MultiFactorAuthPresent",
+              "valueType": "boolean"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            [true, "explicitlyDenied"],
+            [false, "notDenied"],
+            [null, "notDenied"]
+          ]
+        }
+      }
+    },
+    {
+      "name": "includes missing scenario for BinaryEquals",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Deny",
+              "Action": "s3:PutObject",
+              "Resource": "*",
+              "Condition": {
+                "BinaryEquals": {
+                  "aws:SourceIdentity": "cloud-copilot-example-value"
+                }
+              }
+            }
+          ]
+        },
+        "request": {
+          "action": "s3:PutObject"
+        },
+        "options": {
+          "maxRows": 1000
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "columns": [
+            {
+              "key": "aws:SourceIdentity",
+              "label": "aws:SourceIdentity",
+              "valueType": "string"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            ["cloud-copilot-example-value", "explicitlyDenied"],
+            ["cloud-copilot-other-value", "notDenied"],
+            [null, "notDenied"]
+          ]
+        }
+      }
+    },
+    {
+      "name": "includes missing scenario for IpAddress",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Deny",
+              "Action": "s3:PutObject",
+              "Resource": "*",
+              "Condition": {
+                "IpAddress": {
+                  "aws:SourceIp": "203.0.113.0/24"
+                }
+              }
+            }
+          ]
+        },
+        "request": {
+          "action": "s3:PutObject"
+        },
+        "options": {
+          "maxRows": 1000
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "columns": [
+            {
+              "key": "aws:SourceIp",
+              "label": "aws:SourceIp",
+              "valueType": "ip"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            ["203.0.113.10", "explicitlyDenied"],
+            ["198.51.100.10", "notDenied"],
+            [null, "notDenied"]
+          ]
+        }
+      }
+    },
+    {
+      "name": "includes missing scenario for NotIpAddress",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Deny",
+              "Action": "s3:PutObject",
+              "Resource": "*",
+              "Condition": {
+                "NotIpAddress": {
+                  "aws:SourceIp": "203.0.113.0/24"
+                }
+              }
+            }
+          ]
+        },
+        "request": {
+          "action": "s3:PutObject"
+        },
+        "options": {
+          "maxRows": 1000
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "columns": [
+            {
+              "key": "aws:SourceIp",
+              "label": "aws:SourceIp",
+              "valueType": "ip"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            ["198.51.100.10", "explicitlyDenied"],
+            ["203.0.113.10", "notDenied"],
+            [null, "explicitlyDenied"]
+          ]
+        }
+      }
+    },
+    {
+      "name": "includes missing scenario for ArnEquals",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Deny",
+              "Action": "s3:PutObject",
+              "Resource": "*",
+              "Condition": {
+                "ArnEquals": {
+                  "aws:ChatbotSourceArn": "arn:aws:chatbot::111111111111:chat-configuration/slack-channel/example"
+                }
+              }
+            }
+          ]
+        },
+        "request": {
+          "action": "s3:PutObject"
+        },
+        "options": {
+          "maxRows": 1000
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "columns": [
+            {
+              "key": "aws:ChatbotSourceArn",
+              "label": "aws:ChatbotSourceArn",
+              "valueType": "arn"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            [
+              "arn:aws:chatbot::111111111111:chat-configuration/slack-channel/example",
+              "explicitlyDenied"
+            ],
+            ["arn:aws:iam::222222222222:role/OtherRole", "notDenied"],
+            [null, "notDenied"]
+          ]
+        }
+      }
+    },
+    {
+      "name": "includes missing scenario for ArnLike",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Deny",
+              "Action": "s3:PutObject",
+              "Resource": "*",
+              "Condition": {
+                "ArnLike": {
+                  "aws:ChatbotSourceArn": "arn:aws:chatbot::111111111111:chat-configuration/slack-channel/example"
+                }
+              }
+            }
+          ]
+        },
+        "request": {
+          "action": "s3:PutObject"
+        },
+        "options": {
+          "maxRows": 1000
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "columns": [
+            {
+              "key": "aws:ChatbotSourceArn",
+              "label": "aws:ChatbotSourceArn",
+              "valueType": "arn"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            [
+              "arn:aws:chatbot::111111111111:chat-configuration/slack-channel/example",
+              "explicitlyDenied"
+            ],
+            ["arn:aws:iam::222222222222:role/OtherRole", "notDenied"],
+            [null, "notDenied"]
+          ]
+        }
+      }
+    },
+    {
+      "name": "includes missing scenario for ArnNotEquals",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Deny",
+              "Action": "s3:PutObject",
+              "Resource": "*",
+              "Condition": {
+                "ArnNotEquals": {
+                  "aws:ChatbotSourceArn": "arn:aws:chatbot::111111111111:chat-configuration/slack-channel/example"
+                }
+              }
+            }
+          ]
+        },
+        "request": {
+          "action": "s3:PutObject"
+        },
+        "options": {
+          "maxRows": 1000
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "columns": [
+            {
+              "key": "aws:ChatbotSourceArn",
+              "label": "aws:ChatbotSourceArn",
+              "valueType": "arn"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            ["arn:aws:chatbot::111111111111:chat-configuration/slack-channel/example", "notDenied"],
+            ["arn:aws:iam::222222222222:role/OtherRole", "explicitlyDenied"],
+            [null, "explicitlyDenied"]
+          ]
+        }
+      }
+    },
+    {
+      "name": "includes missing scenario for ArnNotLike",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Deny",
+              "Action": "s3:PutObject",
+              "Resource": "*",
+              "Condition": {
+                "ArnNotLike": {
+                  "aws:ChatbotSourceArn": "arn:aws:chatbot::111111111111:chat-configuration/slack-channel/example"
+                }
+              }
+            }
+          ]
+        },
+        "request": {
+          "action": "s3:PutObject"
+        },
+        "options": {
+          "maxRows": 1000
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "columns": [
+            {
+              "key": "aws:ChatbotSourceArn",
+              "label": "aws:ChatbotSourceArn",
+              "valueType": "arn"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            ["arn:aws:chatbot::111111111111:chat-configuration/slack-channel/example", "notDenied"],
+            ["arn:aws:iam::222222222222:role/OtherRole", "explicitlyDenied"],
+            [null, "explicitlyDenied"]
+          ]
+        }
+      }
+    },
+    {
+      "name": "includes missing scenario for Null",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Deny",
+              "Action": "s3:PutObject",
+              "Resource": "*",
+              "Condition": {
+                "Null": {
+                  "aws:SourceIdentity": "true"
+                }
+              }
+            }
+          ]
+        },
+        "request": {
+          "action": "s3:PutObject"
+        },
+        "options": {
+          "maxRows": 1000
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "columns": [
+            {
+              "key": "aws:SourceIdentity",
+              "label": "aws:SourceIdentity",
+              "valueType": "string"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            [null, "explicitlyDenied"],
+            ["context-key-present", "notDenied"]
+          ]
+        }
+      }
+    },
+    {
+      "name": "includes missing scenario for StringEqualsIfExists",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Deny",
+              "Action": "s3:PutObject",
+              "Resource": "*",
+              "Condition": {
+                "StringEqualsIfExists": {
+                  "aws:SourceIdentity": "cloud-copilot-example-value"
+                }
+              }
+            }
+          ]
+        },
+        "request": {
+          "action": "s3:PutObject"
+        },
+        "options": {
+          "maxRows": 1000
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "columns": [
+            {
+              "key": "aws:SourceIdentity",
+              "label": "aws:SourceIdentity",
+              "valueType": "string"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            ["cloud-copilot-example-value", "explicitlyDenied"],
+            ["cloud-copilot-other-value", "notDenied"],
+            [null, "explicitlyDenied"]
+          ]
+        }
+      }
+    },
+    {
+      "name": "includes missing scenario for ForAnyValue:StringEquals",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Deny",
+              "Action": "s3:PutObject",
+              "Resource": "*",
+              "Condition": {
+                "ForAnyValue:StringEquals": {
+                  "aws:TagKeys": ["cloud-copilot-example-value"]
+                }
+              }
+            }
+          ]
+        },
+        "request": {
+          "action": "s3:PutObject"
+        },
+        "options": {
+          "maxRows": 1000
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "columns": [
+            {
+              "key": "aws:TagKeys",
+              "label": "aws:TagKeys",
+              "valueType": "string"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            [["cloud-copilot-other-value"], "notDenied"],
+            [["cloud-copilot-example-value", "cloud-copilot-other-value"], "explicitlyDenied"],
+            [["cloud-copilot-example-value"], "explicitlyDenied"],
+            [null, "notDenied"]
+          ]
+        }
+      }
+    },
+    {
+      "name": "includes missing scenario for ForAllValues:StringEquals",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Deny",
+              "Action": "s3:PutObject",
+              "Resource": "*",
+              "Condition": {
+                "ForAllValues:StringEquals": {
+                  "aws:TagKeys": ["cloud-copilot-example-value"]
+                }
+              }
+            }
+          ]
+        },
+        "request": {
+          "action": "s3:PutObject"
+        },
+        "options": {
+          "maxRows": 1000
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "columns": [
+            {
+              "key": "aws:TagKeys",
+              "label": "aws:TagKeys",
+              "valueType": "string"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            [["cloud-copilot-other-value"], "notDenied"],
+            [["cloud-copilot-example-value", "cloud-copilot-other-value"], "notDenied"],
+            [["cloud-copilot-example-value"], "explicitlyDenied"],
+            [null, "explicitlyDenied"]
+          ]
+        }
+      }
+    }
+  ]
+}

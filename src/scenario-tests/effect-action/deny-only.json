@@ -1,0 +1,124 @@
+{
+  "description": "Effect/action matrix: deny-only",
+  "cases": [
+    {
+      "name": "deny only with Action succeeds",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Deny",
+              "Action": "s3:PutObject",
+              "Resource": "*",
+              "Condition": {
+                "StringEqualsIfExists": {
+                  "aws:ResourceOrgID": "o-example"
+                }
+              }
+            }
+          ]
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "effectMode": "denyOnly",
+          "columns": [
+            {
+              "key": "aws:ResourceOrgID",
+              "label": "Organization ID",
+              "valueType": "string"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            ["o-example", "explicitlyDenied"],
+            ["o-otherorg", "notDenied"],
+            [null, "explicitlyDenied"]
+          ]
+        }
+      }
+    },
+    {
+      "name": "deny only with NotAction succeeds",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Deny",
+              "NotAction": "s3:GetObject",
+              "Resource": "*",
+              "Condition": {
+                "StringEqualsIfExists": {
+                  "aws:ResourceOrgID": "o-example"
+                }
+              }
+            }
+          ]
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "effectMode": "denyOnly",
+          "columns": [
+            {
+              "key": "aws:ResourceOrgID",
+              "label": "Organization ID",
+              "valueType": "string"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            ["o-example", "explicitlyDenied"],
+            ["o-otherorg", "notDenied"],
+            [null, "explicitlyDenied"]
+          ]
+        }
+      }
+    },
+    {
+      "name": "deny only with Action and NotAction is invalid",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Deny",
+              "Action": "s3:PutObject",
+              "NotAction": "ec2:*",
+              "Resource": "*"
+            }
+          ]
+        }
+      },
+      "expected": {
+        "exactResult": {
+          "resultType": "invalidPolicy",
+          "diagnostics": [
+            {
+              "severity": "error",
+              "code": "INVALID_POLICY",
+              "message": "Only one of Action or NotAction is allowed, found both",
+              "path": "Statement[0]",
+              "policyType": "scp"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

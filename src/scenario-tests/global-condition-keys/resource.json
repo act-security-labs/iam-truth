@@ -1,0 +1,202 @@
+{
+  "description": "Global condition keys in resource category",
+  "cases": [
+    {
+      "name": "global condition key aws:ResourceAccount",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Deny",
+              "Action": "s3:PutObject",
+              "Resource": "*",
+              "Condition": {
+                "StringEqualsIfExists": {
+                  "aws:ResourceAccount": "cloud-copilot-example-value"
+                }
+              }
+            }
+          ]
+        },
+        "request": {
+          "action": "s3:PutObject"
+        },
+        "options": {
+          "maxRows": 1000
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "columns": [
+            {
+              "key": "aws:ResourceAccount",
+              "label": "aws:ResourceAccount",
+              "valueType": "string"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            ["cloud-copilot-example-value", "explicitlyDenied"],
+            ["222222222222", "notDenied"],
+            [null, "explicitlyDenied"]
+          ]
+        }
+      }
+    },
+    {
+      "name": "global condition key aws:ResourceOrgID",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Deny",
+              "Action": "s3:PutObject",
+              "Resource": "*",
+              "Condition": {
+                "StringEqualsIfExists": {
+                  "aws:ResourceOrgID": "cloud-copilot-example-value"
+                }
+              }
+            }
+          ]
+        },
+        "request": {
+          "action": "s3:PutObject"
+        },
+        "options": {
+          "maxRows": 1000
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "columns": [
+            {
+              "key": "aws:ResourceOrgID",
+              "label": "Organization ID",
+              "valueType": "string"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            ["cloud-copilot-example-value", "explicitlyDenied"],
+            ["o-otherorg", "notDenied"],
+            [null, "explicitlyDenied"]
+          ]
+        }
+      }
+    },
+    {
+      "name": "global condition key aws:ResourceOrgPaths",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Deny",
+              "Action": "s3:PutObject",
+              "Resource": "*",
+              "Condition": {
+                "ForAnyValue:StringEqualsIfExists": {
+                  "aws:ResourceOrgPaths": ["cloud-copilot-example-value"]
+                }
+              }
+            }
+          ]
+        },
+        "request": {
+          "action": "s3:PutObject"
+        },
+        "options": {
+          "maxRows": 1000
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "columns": [
+            {
+              "key": "aws:ResourceOrgPaths",
+              "label": "Resource Organization Paths",
+              "valueType": "string"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            [["o-otherorg/r-root/ou-other/"], "notDenied"],
+            [["cloud-copilot-example-value", "o-otherorg/r-root/ou-other/"], "explicitlyDenied"],
+            [["cloud-copilot-example-value"], "explicitlyDenied"],
+            [null, "notDenied"]
+          ]
+        }
+      }
+    },
+    {
+      "name": "global condition key aws:ResourceTag/tag-key",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Deny",
+              "Action": "s3:PutObject",
+              "Resource": "*",
+              "Condition": {
+                "StringEqualsIfExists": {
+                  "aws:ResourceTag/tag-key": "cloud-copilot-example-value"
+                }
+              }
+            }
+          ]
+        },
+        "request": {
+          "action": "s3:PutObject"
+        },
+        "options": {
+          "maxRows": 1000
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "columns": [
+            {
+              "key": "aws:ResourceTag/tag-key",
+              "label": "aws:ResourceTag/tag-key",
+              "valueType": "string"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            ["cloud-copilot-example-value", "explicitlyDenied"],
+            ["cloud-copilot-other-value", "notDenied"],
+            [null, "explicitlyDenied"]
+          ]
+        }
+      }
+    }
+  ]
+}

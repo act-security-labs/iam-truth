@@ -1,0 +1,106 @@
+{
+  "description": "Simplified truth-table rows",
+  "cases": [
+    {
+      "name": "simplifies TLS denial and follow-on redundant rows",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Sid": "DenyRequestsWithoutTLS",
+              "Effect": "Deny",
+              "Action": "*",
+              "Resource": "*",
+              "Condition": {
+                "Bool": {
+                  "aws:SecureTransport": "false"
+                }
+              }
+            },
+            {
+              "Sid": "DenyCrossRegionUnlessTaggedException",
+              "Effect": "Deny",
+              "Action": "*",
+              "Resource": "*",
+              "Condition": {
+                "StringNotEquals": {
+                  "aws:RequestedRegion": "us-east-1"
+                },
+                "StringNotEqualsIfExists": {
+                  "aws:PrincipalTag/AllowAllRegions": "true"
+                }
+              }
+            }
+          ]
+        },
+        "request": {
+          "action": "s3:PutObject"
+        },
+        "options": {
+          "simplifyTables": true,
+          "maxRows": 1000
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "columns": [
+            {
+              "key": "aws:SecureTransport",
+              "label": "aws:SecureTransport",
+              "valueType": "boolean"
+            },
+            {
+              "key": "aws:RequestedRegion",
+              "label": "aws:RequestedRegion",
+              "valueType": "string"
+            },
+            {
+              "key": "aws:PrincipalTag/AllowAllRegions",
+              "label": "aws:PrincipalTag/AllowAllRegions",
+              "valueType": "string"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "simplification": {
+            "strategy": "greedyMaxCoverage",
+            "sourceRowCount": 12,
+            "simplifiedRowCount": 5
+          },
+          "rows": [
+            [
+              false,
+              {
+                "cellType": "any",
+                "label": "Any"
+              },
+              {
+                "cellType": "any",
+                "label": "Any"
+              },
+              "explicitlyDenied"
+            ],
+            [
+              true,
+              "us-east-1",
+              {
+                "cellType": "any",
+                "label": "Any"
+              },
+              "notDenied"
+            ],
+            [true, "cloud-copilot-other-value", "true", "notDenied"],
+            [true, "cloud-copilot-other-value", "cloud-copilot-other-value", "explicitlyDenied"],
+            [true, "cloud-copilot-other-value", null, "explicitlyDenied"]
+          ]
+        }
+      }
+    }
+  ]
+}
