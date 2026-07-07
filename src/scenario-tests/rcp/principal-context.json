@@ -1,0 +1,161 @@
+{
+  "description": "RCP principal context can be absent for anonymous-style requests",
+  "cases": [
+    {
+      "name": "RCP includes missing scenario for aws:PrincipalAccount",
+      "input": {
+        "policyType": "rcp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Sid": "DenyPrincipalAccount",
+              "Effect": "Deny",
+              "Principal": "*",
+              "Action": "s3:GetObject",
+              "Resource": "*",
+              "Condition": {
+                "StringEqualsIfExists": {
+                  "aws:PrincipalAccount": "111111111111"
+                }
+              }
+            }
+          ]
+        },
+        "request": {
+          "action": "s3:GetObject",
+          "resources": ["arn:aws:s3:::example-bucket/example.txt"]
+        },
+        "options": {
+          "maxRows": 1000
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "columns": [
+            {
+              "key": "aws:PrincipalAccount",
+              "label": "aws:PrincipalAccount",
+              "valueType": "string"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            ["111111111111", "explicitlyDenied"],
+            ["222222222222", "notDenied"],
+            [null, "explicitlyDenied"]
+          ]
+        }
+      }
+    },
+    {
+      "name": "RCP includes missing scenario for aws:PrincipalArn",
+      "input": {
+        "policyType": "rcp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Sid": "DenyPrincipalArn",
+              "Effect": "Deny",
+              "Principal": "*",
+              "Action": "s3:GetObject",
+              "Resource": "*",
+              "Condition": {
+                "ArnEqualsIfExists": {
+                  "aws:PrincipalArn": "arn:aws:iam::111111111111:role/TestRole"
+                }
+              }
+            }
+          ]
+        },
+        "request": {
+          "action": "s3:GetObject",
+          "resources": ["arn:aws:s3:::example-bucket/example.txt"]
+        },
+        "options": {
+          "maxRows": 1000
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "columns": [
+            {
+              "key": "aws:PrincipalArn",
+              "label": "aws:PrincipalArn",
+              "valueType": "arn"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            ["arn:aws:iam::111111111111:role/TestRole", "explicitlyDenied"],
+            ["arn:aws:iam::222222222222:role/OtherRole", "notDenied"],
+            [null, "explicitlyDenied"]
+          ]
+        }
+      }
+    },
+    {
+      "name": "RCP includes missing scenario for aws:PrincipalOrgID",
+      "input": {
+        "policyType": "rcp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Sid": "DenyPrincipalOrgID",
+              "Effect": "Deny",
+              "Principal": "*",
+              "Action": "s3:GetObject",
+              "Resource": "*",
+              "Condition": {
+                "StringEqualsIfExists": {
+                  "aws:PrincipalOrgID": "o-example"
+                }
+              }
+            }
+          ]
+        },
+        "request": {
+          "action": "s3:GetObject",
+          "resources": ["arn:aws:s3:::example-bucket/example.txt"]
+        },
+        "options": {
+          "maxRows": 1000
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "columns": [
+            {
+              "key": "aws:PrincipalOrgID",
+              "label": "Principal Organization ID",
+              "valueType": "string"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            ["o-example", "explicitlyDenied"],
+            ["o-otherorg", "notDenied"],
+            [null, "explicitlyDenied"]
+          ]
+        }
+      }
+    }
+  ]
+}

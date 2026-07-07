@@ -1,0 +1,55 @@
+{
+  "description": "Multiple requested resources",
+  "cases": [
+    {
+      "name": "emits one row per requested resource and includes a resource column",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Sid": "DenyFirstObject",
+              "Effect": "Deny",
+              "Action": "s3:GetObject",
+              "Resource": "arn:aws:s3:::example-bucket/first.txt"
+            }
+          ]
+        },
+        "request": {
+          "action": "s3:GetObject",
+          "resources": [
+            "arn:aws:s3:::example-bucket/first.txt",
+            "arn:aws:s3:::example-bucket/second.txt"
+          ]
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "testedAction": "s3:GetObject",
+          "testedResources": [
+            "arn:aws:s3:::example-bucket/first.txt",
+            "arn:aws:s3:::example-bucket/second.txt"
+          ],
+          "columns": [
+            {
+              "key": "resource",
+              "label": "Resource",
+              "valueType": "arn"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            ["arn:aws:s3:::example-bucket/first.txt", "explicitlyDenied"],
+            ["arn:aws:s3:::example-bucket/second.txt", "notDenied"]
+          ]
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,123 @@
+{
+  "description": "Effect/action matrix: allow-only",
+  "cases": [
+    {
+      "name": "allow only with Action succeeds",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": "s3:PutObject",
+              "Resource": "*",
+              "Condition": {
+                "StringEqualsIfExists": {
+                  "aws:ResourceOrgID": "o-example"
+                }
+              }
+            }
+          ]
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "effectMode": "allowOnly",
+          "columns": [
+            {
+              "key": "aws:ResourceOrgID",
+              "label": "Organization ID",
+              "valueType": "string"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            ["o-example", "allowed"],
+            ["o-otherorg", "implicitlyDenied"],
+            [null, "allowed"]
+          ]
+        }
+      }
+    },
+    {
+      "name": "allow only with NotAction succeeds",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "NotAction": "s3:*",
+              "Resource": "*",
+              "Condition": {
+                "StringEqualsIfExists": {
+                  "aws:RequestedRegion": "us-east-1"
+                }
+              }
+            }
+          ]
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "effectMode": "allowOnly",
+          "columns": [
+            {
+              "key": "aws:RequestedRegion",
+              "label": "aws:RequestedRegion",
+              "valueType": "string"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            ["us-east-1", "allowed"],
+            ["us-other-2", "implicitlyDenied"]
+          ]
+        }
+      }
+    },
+    {
+      "name": "allow only with Action and NotAction is invalid",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": "s3:PutObject",
+              "NotAction": "ec2:*",
+              "Resource": "*"
+            }
+          ]
+        }
+      },
+      "expected": {
+        "exactResult": {
+          "resultType": "invalidPolicy",
+          "diagnostics": [
+            {
+              "severity": "error",
+              "code": "INVALID_POLICY",
+              "message": "Only one of Action or NotAction is allowed, found both",
+              "path": "Statement[0]",
+              "policyType": "scp"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

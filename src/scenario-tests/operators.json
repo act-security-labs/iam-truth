@@ -1,0 +1,1667 @@
+{
+  "description": "Condition operator support matrix",
+  "cases": [
+    {
+      "name": "supports StringEquals",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Deny",
+              "Action": "s3:PutObject",
+              "Resource": "*",
+              "Condition": {
+                "StringEquals": {
+                  "aws:UserAgent": "aws-cli/2.15.0"
+                }
+              }
+            }
+          ]
+        },
+        "request": {
+          "action": "s3:PutObject"
+        },
+        "options": {
+          "maxRows": 1000
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "columns": [
+            {
+              "key": "aws:UserAgent",
+              "label": "aws:UserAgent",
+              "valueType": "string"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            ["aws-cli/2.15.0", "explicitlyDenied"],
+            ["aws-sdk-js/3.x", "notDenied"]
+          ]
+        }
+      }
+    },
+    {
+      "name": "supports StringNotEquals",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Deny",
+              "Action": "s3:PutObject",
+              "Resource": "*",
+              "Condition": {
+                "StringNotEquals": {
+                  "aws:UserAgent": "aws-cli/2.15.0"
+                }
+              }
+            }
+          ]
+        },
+        "request": {
+          "action": "s3:PutObject"
+        },
+        "options": {
+          "maxRows": 1000
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "columns": [
+            {
+              "key": "aws:UserAgent",
+              "label": "aws:UserAgent",
+              "valueType": "string"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            ["aws-cli/2.15.0", "notDenied"],
+            ["aws-sdk-js/3.x", "explicitlyDenied"]
+          ]
+        }
+      }
+    },
+    {
+      "name": "supports StringEqualsIgnoreCase",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Deny",
+              "Action": "s3:PutObject",
+              "Resource": "*",
+              "Condition": {
+                "StringEqualsIgnoreCase": {
+                  "aws:UserAgent": "aws-cli/2.15.0"
+                }
+              }
+            }
+          ]
+        },
+        "request": {
+          "action": "s3:PutObject"
+        },
+        "options": {
+          "maxRows": 1000
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "columns": [
+            {
+              "key": "aws:UserAgent",
+              "label": "aws:UserAgent",
+              "valueType": "string"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            ["aws-cli/2.15.0", "explicitlyDenied"],
+            ["aws-sdk-js/3.x", "notDenied"]
+          ]
+        }
+      }
+    },
+    {
+      "name": "supports StringNotEqualsIgnoreCase",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Deny",
+              "Action": "s3:PutObject",
+              "Resource": "*",
+              "Condition": {
+                "StringNotEqualsIgnoreCase": {
+                  "aws:UserAgent": "aws-cli/2.15.0"
+                }
+              }
+            }
+          ]
+        },
+        "request": {
+          "action": "s3:PutObject"
+        },
+        "options": {
+          "maxRows": 1000
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "columns": [
+            {
+              "key": "aws:UserAgent",
+              "label": "aws:UserAgent",
+              "valueType": "string"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            ["aws-cli/2.15.0", "notDenied"],
+            ["aws-sdk-js/3.x", "explicitlyDenied"]
+          ]
+        }
+      }
+    },
+    {
+      "name": "supports StringLike",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Deny",
+              "Action": "s3:PutObject",
+              "Resource": "*",
+              "Condition": {
+                "StringLike": {
+                  "aws:UserAgent": "cloud-copilot-*"
+                }
+              }
+            }
+          ]
+        },
+        "request": {
+          "action": "s3:PutObject"
+        },
+        "options": {
+          "maxRows": 1000
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "columns": [
+            {
+              "key": "aws:UserAgent",
+              "label": "aws:UserAgent",
+              "valueType": "string"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            ["cloud-copilot-example", "explicitlyDenied"],
+            ["not-cloud-copilot-example", "notDenied"]
+          ]
+        }
+      }
+    },
+    {
+      "name": "supports StringNotLike",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Deny",
+              "Action": "s3:PutObject",
+              "Resource": "*",
+              "Condition": {
+                "StringNotLike": {
+                  "aws:UserAgent": "cloud-copilot-*"
+                }
+              }
+            }
+          ]
+        },
+        "request": {
+          "action": "s3:PutObject"
+        },
+        "options": {
+          "maxRows": 1000
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "columns": [
+            {
+              "key": "aws:UserAgent",
+              "label": "aws:UserAgent",
+              "valueType": "string"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            ["cloud-copilot-example", "notDenied"],
+            ["not-cloud-copilot-example", "explicitlyDenied"]
+          ]
+        }
+      }
+    },
+    {
+      "name": "supports NumericEquals",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Deny",
+              "Action": "s3:PutObject",
+              "Resource": "*",
+              "Condition": {
+                "NumericEquals": {
+                  "aws:MultiFactorAuthAge": "5"
+                }
+              }
+            }
+          ]
+        },
+        "request": {
+          "action": "s3:PutObject"
+        },
+        "options": {
+          "maxRows": 1000
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "columns": [
+            {
+              "key": "aws:MultiFactorAuthAge",
+              "label": "aws:MultiFactorAuthAge",
+              "valueType": "number"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            [5, "explicitlyDenied"],
+            [6, "notDenied"],
+            [null, "notDenied"]
+          ]
+        }
+      }
+    },
+    {
+      "name": "supports NumericNotEquals",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Deny",
+              "Action": "s3:PutObject",
+              "Resource": "*",
+              "Condition": {
+                "NumericNotEquals": {
+                  "aws:MultiFactorAuthAge": "5"
+                }
+              }
+            }
+          ]
+        },
+        "request": {
+          "action": "s3:PutObject"
+        },
+        "options": {
+          "maxRows": 1000
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "columns": [
+            {
+              "key": "aws:MultiFactorAuthAge",
+              "label": "aws:MultiFactorAuthAge",
+              "valueType": "number"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            [6, "explicitlyDenied"],
+            [5, "notDenied"],
+            [null, "explicitlyDenied"]
+          ]
+        }
+      }
+    },
+    {
+      "name": "supports NumericLessThan",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Deny",
+              "Action": "s3:PutObject",
+              "Resource": "*",
+              "Condition": {
+                "NumericLessThan": {
+                  "aws:MultiFactorAuthAge": "5"
+                }
+              }
+            }
+          ]
+        },
+        "request": {
+          "action": "s3:PutObject"
+        },
+        "options": {
+          "maxRows": 1000
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "columns": [
+            {
+              "key": "aws:MultiFactorAuthAge",
+              "label": "aws:MultiFactorAuthAge",
+              "valueType": "number"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            [4, "explicitlyDenied"],
+            [5, "notDenied"],
+            [6, "notDenied"],
+            [null, "notDenied"]
+          ]
+        }
+      }
+    },
+    {
+      "name": "supports NumericLessThanEquals",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Deny",
+              "Action": "s3:PutObject",
+              "Resource": "*",
+              "Condition": {
+                "NumericLessThanEquals": {
+                  "aws:MultiFactorAuthAge": "5"
+                }
+              }
+            }
+          ]
+        },
+        "request": {
+          "action": "s3:PutObject"
+        },
+        "options": {
+          "maxRows": 1000
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "columns": [
+            {
+              "key": "aws:MultiFactorAuthAge",
+              "label": "aws:MultiFactorAuthAge",
+              "valueType": "number"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            [4, "explicitlyDenied"],
+            [5, "explicitlyDenied"],
+            [6, "notDenied"],
+            [null, "notDenied"]
+          ]
+        }
+      }
+    },
+    {
+      "name": "supports NumericGreaterThan",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Deny",
+              "Action": "s3:PutObject",
+              "Resource": "*",
+              "Condition": {
+                "NumericGreaterThan": {
+                  "aws:MultiFactorAuthAge": "5"
+                }
+              }
+            }
+          ]
+        },
+        "request": {
+          "action": "s3:PutObject"
+        },
+        "options": {
+          "maxRows": 1000
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "columns": [
+            {
+              "key": "aws:MultiFactorAuthAge",
+              "label": "aws:MultiFactorAuthAge",
+              "valueType": "number"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            [4, "notDenied"],
+            [5, "notDenied"],
+            [6, "explicitlyDenied"],
+            [null, "notDenied"]
+          ]
+        }
+      }
+    },
+    {
+      "name": "supports NumericGreaterThanEquals",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Deny",
+              "Action": "s3:PutObject",
+              "Resource": "*",
+              "Condition": {
+                "NumericGreaterThanEquals": {
+                  "aws:MultiFactorAuthAge": "5"
+                }
+              }
+            }
+          ]
+        },
+        "request": {
+          "action": "s3:PutObject"
+        },
+        "options": {
+          "maxRows": 1000
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "columns": [
+            {
+              "key": "aws:MultiFactorAuthAge",
+              "label": "aws:MultiFactorAuthAge",
+              "valueType": "number"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            [4, "notDenied"],
+            [5, "explicitlyDenied"],
+            [6, "explicitlyDenied"],
+            [null, "notDenied"]
+          ]
+        }
+      }
+    },
+    {
+      "name": "supports DateEquals",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Deny",
+              "Action": "s3:PutObject",
+              "Resource": "*",
+              "Condition": {
+                "DateEquals": {
+                  "aws:CurrentTime": "2024-01-01T00:00:00Z"
+                }
+              }
+            }
+          ]
+        },
+        "request": {
+          "action": "s3:PutObject"
+        },
+        "options": {
+          "maxRows": 1000
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "columns": [
+            {
+              "key": "aws:CurrentTime",
+              "label": "aws:CurrentTime",
+              "valueType": "date"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            ["2024-01-01T00:00:00.000Z", "explicitlyDenied"],
+            ["2024-01-02T00:00:00.000Z", "notDenied"]
+          ]
+        }
+      }
+    },
+    {
+      "name": "supports DateNotEquals",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Deny",
+              "Action": "s3:PutObject",
+              "Resource": "*",
+              "Condition": {
+                "DateNotEquals": {
+                  "aws:CurrentTime": "2024-01-01T00:00:00Z"
+                }
+              }
+            }
+          ]
+        },
+        "request": {
+          "action": "s3:PutObject"
+        },
+        "options": {
+          "maxRows": 1000
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "columns": [
+            {
+              "key": "aws:CurrentTime",
+              "label": "aws:CurrentTime",
+              "valueType": "date"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            ["2024-01-02T00:00:00.000Z", "explicitlyDenied"],
+            ["2024-01-01T00:00:00.000Z", "notDenied"]
+          ]
+        }
+      }
+    },
+    {
+      "name": "supports DateLessThan",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Deny",
+              "Action": "s3:PutObject",
+              "Resource": "*",
+              "Condition": {
+                "DateLessThan": {
+                  "aws:CurrentTime": "2024-01-01T00:00:00Z"
+                }
+              }
+            }
+          ]
+        },
+        "request": {
+          "action": "s3:PutObject"
+        },
+        "options": {
+          "maxRows": 1000
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "columns": [
+            {
+              "key": "aws:CurrentTime",
+              "label": "aws:CurrentTime",
+              "valueType": "date"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            ["2023-12-31T00:00:00.000Z", "explicitlyDenied"],
+            ["2024-01-02T00:00:00.000Z", "notDenied"]
+          ]
+        }
+      }
+    },
+    {
+      "name": "supports DateLessThanEquals",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Deny",
+              "Action": "s3:PutObject",
+              "Resource": "*",
+              "Condition": {
+                "DateLessThanEquals": {
+                  "aws:CurrentTime": "2024-01-01T00:00:00Z"
+                }
+              }
+            }
+          ]
+        },
+        "request": {
+          "action": "s3:PutObject"
+        },
+        "options": {
+          "maxRows": 1000
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "columns": [
+            {
+              "key": "aws:CurrentTime",
+              "label": "aws:CurrentTime",
+              "valueType": "date"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            ["2023-12-31T00:00:00.000Z", "explicitlyDenied"],
+            ["2024-01-02T00:00:00.000Z", "notDenied"]
+          ]
+        }
+      }
+    },
+    {
+      "name": "supports DateGreaterThan",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Deny",
+              "Action": "s3:PutObject",
+              "Resource": "*",
+              "Condition": {
+                "DateGreaterThan": {
+                  "aws:CurrentTime": "2024-01-01T00:00:00Z"
+                }
+              }
+            }
+          ]
+        },
+        "request": {
+          "action": "s3:PutObject"
+        },
+        "options": {
+          "maxRows": 1000
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "columns": [
+            {
+              "key": "aws:CurrentTime",
+              "label": "aws:CurrentTime",
+              "valueType": "date"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            ["2024-01-02T00:00:00.000Z", "explicitlyDenied"],
+            ["2023-12-31T00:00:00.000Z", "notDenied"]
+          ]
+        }
+      }
+    },
+    {
+      "name": "supports DateGreaterThanEquals",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Deny",
+              "Action": "s3:PutObject",
+              "Resource": "*",
+              "Condition": {
+                "DateGreaterThanEquals": {
+                  "aws:CurrentTime": "2024-01-01T00:00:00Z"
+                }
+              }
+            }
+          ]
+        },
+        "request": {
+          "action": "s3:PutObject"
+        },
+        "options": {
+          "maxRows": 1000
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "columns": [
+            {
+              "key": "aws:CurrentTime",
+              "label": "aws:CurrentTime",
+              "valueType": "date"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            ["2024-01-02T00:00:00.000Z", "explicitlyDenied"],
+            ["2023-12-31T00:00:00.000Z", "notDenied"]
+          ]
+        }
+      }
+    },
+    {
+      "name": "supports Bool",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Deny",
+              "Action": "s3:PutObject",
+              "Resource": "*",
+              "Condition": {
+                "Bool": {
+                  "aws:SecureTransport": "false"
+                }
+              }
+            }
+          ]
+        },
+        "request": {
+          "action": "s3:PutObject"
+        },
+        "options": {
+          "maxRows": 1000
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "columns": [
+            {
+              "key": "aws:SecureTransport",
+              "label": "aws:SecureTransport",
+              "valueType": "boolean"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            [false, "explicitlyDenied"],
+            [true, "notDenied"]
+          ]
+        }
+      }
+    },
+    {
+      "name": "supports BinaryEquals",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Deny",
+              "Action": "s3:PutObject",
+              "Resource": "*",
+              "Condition": {
+                "BinaryEquals": {
+                  "aws:UserAgent": "aws-cli/2.15.0"
+                }
+              }
+            }
+          ]
+        },
+        "request": {
+          "action": "s3:PutObject"
+        },
+        "options": {
+          "maxRows": 1000
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "columns": [
+            {
+              "key": "aws:UserAgent",
+              "label": "aws:UserAgent",
+              "valueType": "string"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            ["aws-cli/2.15.0", "explicitlyDenied"],
+            ["aws-sdk-js/3.x", "notDenied"]
+          ]
+        }
+      }
+    },
+    {
+      "name": "supports IpAddress",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Deny",
+              "Action": "s3:PutObject",
+              "Resource": "*",
+              "Condition": {
+                "IpAddress": {
+                  "aws:SourceIp": "203.0.113.0/24"
+                }
+              }
+            }
+          ]
+        },
+        "request": {
+          "action": "s3:PutObject"
+        },
+        "options": {
+          "maxRows": 1000
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "columns": [
+            {
+              "key": "aws:SourceIp",
+              "label": "aws:SourceIp",
+              "valueType": "ip"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            ["203.0.113.10", "explicitlyDenied"],
+            ["198.51.100.10", "notDenied"],
+            [null, "notDenied"]
+          ]
+        }
+      }
+    },
+    {
+      "name": "supports NotIpAddress",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Deny",
+              "Action": "s3:PutObject",
+              "Resource": "*",
+              "Condition": {
+                "NotIpAddress": {
+                  "aws:SourceIp": "203.0.113.0/24"
+                }
+              }
+            }
+          ]
+        },
+        "request": {
+          "action": "s3:PutObject"
+        },
+        "options": {
+          "maxRows": 1000
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "columns": [
+            {
+              "key": "aws:SourceIp",
+              "label": "aws:SourceIp",
+              "valueType": "ip"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            ["198.51.100.10", "explicitlyDenied"],
+            ["203.0.113.10", "notDenied"],
+            [null, "explicitlyDenied"]
+          ]
+        }
+      }
+    },
+    {
+      "name": "supports ArnEquals",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Deny",
+              "Action": "s3:PutObject",
+              "Resource": "*",
+              "Condition": {
+                "ArnEquals": {
+                  "aws:PrincipalArn": "arn:aws:iam::111111111111:role/TestRole"
+                }
+              }
+            }
+          ]
+        },
+        "request": {
+          "action": "s3:PutObject"
+        },
+        "options": {
+          "maxRows": 1000
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "columns": [
+            {
+              "key": "aws:PrincipalArn",
+              "label": "aws:PrincipalArn",
+              "valueType": "arn"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            ["arn:aws:iam::111111111111:role/TestRole", "explicitlyDenied"],
+            ["arn:aws:iam::222222222222:role/OtherRole", "notDenied"]
+          ]
+        }
+      }
+    },
+    {
+      "name": "supports ArnLike",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Deny",
+              "Action": "s3:PutObject",
+              "Resource": "*",
+              "Condition": {
+                "ArnLike": {
+                  "aws:PrincipalArn": "arn:aws:iam::111111111111:role/TestRole"
+                }
+              }
+            }
+          ]
+        },
+        "request": {
+          "action": "s3:PutObject"
+        },
+        "options": {
+          "maxRows": 1000
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "columns": [
+            {
+              "key": "aws:PrincipalArn",
+              "label": "aws:PrincipalArn",
+              "valueType": "arn"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            ["arn:aws:iam::111111111111:role/TestRole", "explicitlyDenied"],
+            ["arn:aws:iam::222222222222:role/OtherRole", "notDenied"]
+          ]
+        }
+      }
+    },
+    {
+      "name": "supports ArnNotEquals",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Deny",
+              "Action": "s3:PutObject",
+              "Resource": "*",
+              "Condition": {
+                "ArnNotEquals": {
+                  "aws:PrincipalArn": "arn:aws:iam::111111111111:role/TestRole"
+                }
+              }
+            }
+          ]
+        },
+        "request": {
+          "action": "s3:PutObject"
+        },
+        "options": {
+          "maxRows": 1000
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "columns": [
+            {
+              "key": "aws:PrincipalArn",
+              "label": "aws:PrincipalArn",
+              "valueType": "arn"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            ["arn:aws:iam::111111111111:role/TestRole", "notDenied"],
+            ["arn:aws:iam::222222222222:role/OtherRole", "explicitlyDenied"]
+          ]
+        }
+      }
+    },
+    {
+      "name": "supports ArnNotLike",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Deny",
+              "Action": "s3:PutObject",
+              "Resource": "*",
+              "Condition": {
+                "ArnNotLike": {
+                  "aws:PrincipalArn": "arn:aws:iam::111111111111:role/TestRole"
+                }
+              }
+            }
+          ]
+        },
+        "request": {
+          "action": "s3:PutObject"
+        },
+        "options": {
+          "maxRows": 1000
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "columns": [
+            {
+              "key": "aws:PrincipalArn",
+              "label": "aws:PrincipalArn",
+              "valueType": "arn"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            ["arn:aws:iam::111111111111:role/TestRole", "notDenied"],
+            ["arn:aws:iam::222222222222:role/OtherRole", "explicitlyDenied"]
+          ]
+        }
+      }
+    },
+    {
+      "name": "supports Null",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Deny",
+              "Action": "s3:PutObject",
+              "Resource": "*",
+              "Condition": {
+                "Null": {
+                  "aws:SourceIdentity": "true"
+                }
+              }
+            }
+          ]
+        },
+        "request": {
+          "action": "s3:PutObject"
+        },
+        "options": {
+          "maxRows": 1000
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "columns": [
+            {
+              "key": "aws:SourceIdentity",
+              "label": "aws:SourceIdentity",
+              "valueType": "string"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            [null, "explicitlyDenied"],
+            ["alice", "notDenied"]
+          ]
+        }
+      }
+    },
+    {
+      "name": "supports StringEqualsIfExists",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Deny",
+              "Action": "s3:PutObject",
+              "Resource": "*",
+              "Condition": {
+                "StringEqualsIfExists": {
+                  "aws:UserAgent": "aws-cli/2.15.0"
+                }
+              }
+            }
+          ]
+        },
+        "request": {
+          "action": "s3:PutObject"
+        },
+        "options": {
+          "maxRows": 1000
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "columns": [
+            {
+              "key": "aws:UserAgent",
+              "label": "aws:UserAgent",
+              "valueType": "string"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            ["aws-cli/2.15.0", "explicitlyDenied"],
+            ["aws-sdk-js/3.x", "notDenied"]
+          ]
+        }
+      }
+    },
+    {
+      "name": "supports ForAnyValue:StringEquals",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Deny",
+              "Action": "s3:PutObject",
+              "Resource": "*",
+              "Condition": {
+                "ForAnyValue:StringEquals": {
+                  "aws:TagKeys": ["Department"]
+                }
+              }
+            }
+          ]
+        },
+        "request": {
+          "action": "s3:PutObject"
+        },
+        "options": {
+          "maxRows": 1000
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "columns": [
+            {
+              "key": "aws:TagKeys",
+              "label": "aws:TagKeys",
+              "valueType": "string"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            [["Environment"], "notDenied"],
+            [["Department", "Environment"], "explicitlyDenied"],
+            [["Department"], "explicitlyDenied"],
+            [null, "notDenied"]
+          ]
+        }
+      }
+    },
+    {
+      "name": "supports ForAllValues:StringEquals",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Deny",
+              "Action": "s3:PutObject",
+              "Resource": "*",
+              "Condition": {
+                "ForAllValues:StringEquals": {
+                  "aws:TagKeys": ["Department"]
+                }
+              }
+            }
+          ]
+        },
+        "request": {
+          "action": "s3:PutObject"
+        },
+        "options": {
+          "maxRows": 1000
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "columns": [
+            {
+              "key": "aws:TagKeys",
+              "label": "aws:TagKeys",
+              "valueType": "string"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            [["Environment"], "notDenied"],
+            [["Department", "Environment"], "notDenied"],
+            [["Department"], "explicitlyDenied"],
+            [null, "explicitlyDenied"]
+          ]
+        }
+      }
+    },
+    {
+      "name": "supports ForAnyValue:StringEquals on multivalue condition key",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Deny",
+              "Action": "s3:PutObject",
+              "Resource": "*",
+              "Condition": {
+                "ForAnyValue:StringEquals": {
+                  "aws:PrincipalOrgPaths": "o-example/r-root/ou-example/"
+                }
+              }
+            }
+          ]
+        },
+        "request": {
+          "action": "s3:PutObject"
+        },
+        "options": {
+          "maxRows": 1000
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "columns": [
+            {
+              "key": "aws:PrincipalOrgPaths",
+              "label": "Principal Organization Paths",
+              "valueType": "string"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            [["o-otherorg/r-root/ou-root-sandbox/"], "notDenied"],
+            [
+              ["o-example/r-root/ou-example/", "o-otherorg/r-root/ou-root-sandbox/"],
+              "explicitlyDenied"
+            ],
+            [["o-example/r-root/ou-example/"], "explicitlyDenied"]
+          ]
+        }
+      }
+    },
+    {
+      "name": "supports ForAllValues:StringEquals on multivalue condition key",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Deny",
+              "Action": "s3:PutObject",
+              "Resource": "*",
+              "Condition": {
+                "ForAllValues:StringEquals": {
+                  "aws:PrincipalOrgPaths": "o-example/r-root/ou-example/"
+                }
+              }
+            }
+          ]
+        },
+        "request": {
+          "action": "s3:PutObject"
+        },
+        "options": {
+          "maxRows": 1000
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "columns": [
+            {
+              "key": "aws:PrincipalOrgPaths",
+              "label": "Principal Organization Paths",
+              "valueType": "string"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            [["o-otherorg/r-root/ou-root-sandbox/"], "notDenied"],
+            [["o-example/r-root/ou-example/", "o-otherorg/r-root/ou-root-sandbox/"], "notDenied"],
+            [["o-example/r-root/ou-example/"], "explicitlyDenied"]
+          ]
+        }
+      }
+    },
+    {
+      "name": "rejects unsupported ForSomeValues:StringEquals",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Deny",
+              "Action": "s3:PutObject",
+              "Resource": "*",
+              "Condition": {
+                "ForSomeValues:StringEquals": {
+                  "aws:UserAgent": "aws-cli/2.15.0"
+                }
+              }
+            }
+          ]
+        }
+      },
+      "expected": {
+        "exactResult": {
+          "resultType": "invalidPolicy",
+          "diagnostics": [
+            {
+              "severity": "error",
+              "code": "INVALID_POLICY",
+              "message": "Condition set operator must be either ForAllValues or ForAnyValue",
+              "path": "Statement[0].Condition.#ForSomeValues:StringEquals",
+              "policyType": "scp"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "rejects unsupported StringGreaterThan",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Deny",
+              "Action": "s3:PutObject",
+              "Resource": "*",
+              "Condition": {
+                "StringGreaterThan": {
+                  "aws:UserAgent": "aws-cli/2.15.0"
+                }
+              }
+            }
+          ]
+        }
+      },
+      "expected": {
+        "exactResult": {
+          "resultType": "unsupportedConditionKeys",
+          "diagnostics": [
+            {
+              "severity": "error",
+              "code": "UNSUPPORTED_OPERATOR",
+              "message": "Unsupported condition operator StringGreaterThan. iam-truth supports standard string, ARN, numeric, date, boolean, binary, IP address, and Null operators.",
+              "path": "Statement[0].Condition.#StringGreaterThan",
+              "conditionKey": "aws:UserAgent"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "rejects unsupported NumericApproximate",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Deny",
+              "Action": "s3:PutObject",
+              "Resource": "*",
+              "Condition": {
+                "NumericApproximate": {
+                  "aws:UserAgent": "aws-cli/2.15.0"
+                }
+              }
+            }
+          ]
+        }
+      },
+      "expected": {
+        "exactResult": {
+          "resultType": "unsupportedConditionKeys",
+          "diagnostics": [
+            {
+              "severity": "error",
+              "code": "UNSUPPORTED_OPERATOR",
+              "message": "Unsupported condition operator NumericApproximate. iam-truth supports standard string, ARN, numeric, date, boolean, binary, IP address, and Null operators.",
+              "path": "Statement[0].Condition.#NumericApproximate",
+              "conditionKey": "aws:UserAgent"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

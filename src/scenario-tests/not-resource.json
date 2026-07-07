@@ -1,0 +1,148 @@
+{
+  "description": "NotResource statements, modeled on the aws-samples resource-perimeter SCP (Deny Action:* with NotResource exclusions and StringNotEqualsIfExists on aws:ResourceOrgID). With a concrete request resource outside the NotResource list, out-of-org and missing aws:ResourceOrgID values produce Denied rows. With the default wildcard resource, iam-simulate intentionally applies access-discovery semantics (allowed if ANY resource would be allowed), so resource-narrowed Deny statements never match — the final case documents that intended behavior. The web UI flags resource-narrowed Deny statements and lets users set a concrete resource.",
+  "cases": [
+    {
+      "name": "deny with same-service NotResource applies to a resource outside the list",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Deny",
+              "Action": "*",
+              "NotResource": ["arn:aws:s3:::other-bucket/*"],
+              "Condition": {
+                "StringNotEqualsIfExists": {
+                  "aws:ResourceOrgID": "o-exampleorg"
+                }
+              }
+            }
+          ]
+        },
+        "request": {
+          "action": "s3:GetObject",
+          "resources": ["arn:aws:s3:::example-bucket/example.txt"]
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "effectMode": "denyOnly",
+          "columns": [
+            {
+              "key": "aws:ResourceOrgID",
+              "label": "Organization ID",
+              "valueType": "string"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            ["o-exampleorg", "notDenied"],
+            ["o-otherorg", "explicitlyDenied"],
+            [null, "explicitlyDenied"]
+          ]
+        }
+      }
+    },
+    {
+      "name": "deny with cross-service NotResource applies to a resource outside the list",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Deny",
+              "Action": "*",
+              "NotResource": ["arn:aws:iam::aws:policy/*"],
+              "Condition": {
+                "StringNotEqualsIfExists": {
+                  "aws:ResourceOrgID": "o-exampleorg"
+                }
+              }
+            }
+          ]
+        },
+        "request": {
+          "action": "s3:GetObject",
+          "resources": ["arn:aws:s3:::example-bucket/example.txt"]
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "effectMode": "denyOnly",
+          "columns": [
+            {
+              "key": "aws:ResourceOrgID",
+              "label": "Organization ID",
+              "valueType": "string"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            ["o-exampleorg", "notDenied"],
+            ["o-otherorg", "explicitlyDenied"],
+            [null, "explicitlyDenied"]
+          ]
+        }
+      }
+    },
+    {
+      "name": "deny with NotResource never matches the default wildcard resource (access-discovery semantics)",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Deny",
+              "Action": "*",
+              "NotResource": ["arn:aws:s3:::other-bucket/*"],
+              "Condition": {
+                "StringNotEqualsIfExists": {
+                  "aws:ResourceOrgID": "o-exampleorg"
+                }
+              }
+            }
+          ]
+        },
+        "request": {
+          "action": "s3:GetObject"
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "effectMode": "denyOnly",
+          "columns": [
+            {
+              "key": "aws:ResourceOrgID",
+              "label": "Organization ID",
+              "valueType": "string"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            ["o-exampleorg", "notDenied"],
+            ["o-otherorg", "notDenied"],
+            [null, "notDenied"]
+          ]
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,205 @@
+{
+  "description": "Multiple policy values for single-valued condition keys",
+  "cases": [
+    {
+      "name": "single-valued dynamic key shows one representative StringEquals policy value by default",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Deny",
+              "Action": "s3:PutObject",
+              "Resource": "*",
+              "Condition": {
+                "StringEquals": {
+                  "aws:ResourceTag/dept": ["accounting", "sales"]
+                }
+              }
+            }
+          ]
+        },
+        "request": {
+          "action": "s3:PutObject"
+        },
+        "options": {
+          "maxRows": 1000
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "columns": [
+            {
+              "key": "aws:ResourceTag/dept",
+              "label": "aws:ResourceTag/dept",
+              "valueType": "string"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            ["accounting", "explicitlyDenied"],
+            ["finance", "notDenied"],
+            [null, "notDenied"]
+          ]
+        }
+      }
+    },
+    {
+      "name": "single-valued dynamic key can show every StringEquals policy value example",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Deny",
+              "Action": "s3:PutObject",
+              "Resource": "*",
+              "Condition": {
+                "StringEquals": {
+                  "aws:ResourceTag/dept": ["accounting", "sales"]
+                }
+              }
+            }
+          ]
+        },
+        "request": {
+          "action": "s3:PutObject"
+        },
+        "options": {
+          "maxRows": 1000,
+          "showExamplesForAllPolicyValues": true
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "columns": [
+            {
+              "key": "aws:ResourceTag/dept",
+              "label": "aws:ResourceTag/dept",
+              "valueType": "string"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            ["accounting", "explicitlyDenied"],
+            ["sales", "explicitlyDenied"],
+            ["finance", "notDenied"],
+            [null, "notDenied"]
+          ]
+        }
+      }
+    },
+    {
+      "name": "single-valued dynamic key shows one representative StringLike policy pattern by default",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Deny",
+              "Action": "s3:PutObject",
+              "Resource": "*",
+              "Condition": {
+                "StringLike": {
+                  "aws:ResourceTag/dept": ["sales/*", "acct/*"]
+                }
+              }
+            }
+          ]
+        },
+        "request": {
+          "action": "s3:PutObject"
+        },
+        "options": {
+          "maxRows": 1000
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "columns": [
+            {
+              "key": "aws:ResourceTag/dept",
+              "label": "aws:ResourceTag/dept",
+              "valueType": "string"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            ["sales/example", "explicitlyDenied"],
+            ["not-sales/example", "notDenied"],
+            [null, "notDenied"]
+          ]
+        }
+      }
+    },
+    {
+      "name": "single-valued dynamic key can show every StringLike policy pattern example",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Deny",
+              "Action": "s3:PutObject",
+              "Resource": "*",
+              "Condition": {
+                "StringLike": {
+                  "aws:ResourceTag/dept": ["sales/*", "acct/*"]
+                }
+              }
+            }
+          ]
+        },
+        "request": {
+          "action": "s3:PutObject"
+        },
+        "options": {
+          "maxRows": 1000,
+          "showExamplesForAllPolicyValues": true
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "columns": [
+            {
+              "key": "aws:ResourceTag/dept",
+              "label": "aws:ResourceTag/dept",
+              "valueType": "string"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            ["sales/example", "explicitlyDenied"],
+            ["acct/example", "explicitlyDenied"],
+            ["not-sales/example", "notDenied"],
+            [null, "notDenied"]
+          ]
+        }
+      }
+    }
+  ]
+}

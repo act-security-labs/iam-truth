@@ -1,0 +1,163 @@
+{
+  "description": "Effect/action matrix: allow-and-deny",
+  "cases": [
+    {
+      "name": "allow and deny with Action succeeds",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": "s3:PutObject",
+              "Resource": "*",
+              "Condition": {
+                "StringEqualsIfExists": {
+                  "aws:ResourceOrgID": "o-example"
+                }
+              }
+            },
+            {
+              "Effect": "Deny",
+              "Action": "s3:PutObject",
+              "Resource": "*",
+              "Condition": {
+                "BoolIfExists": {
+                  "aws:ViaAWSService": "false"
+                }
+              }
+            }
+          ]
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "effectMode": "allowAndDeny",
+          "columns": [
+            {
+              "key": "aws:ResourceOrgID",
+              "label": "Organization ID",
+              "valueType": "string"
+            },
+            {
+              "key": "aws:ViaAWSService",
+              "label": "Is Via Service?",
+              "valueType": "boolean"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            ["o-example", false, "explicitlyDenied"],
+            ["o-example", true, "allowed"],
+            ["o-otherorg", false, "explicitlyDenied"],
+            ["o-otherorg", true, "implicitlyDenied"],
+            [null, false, "explicitlyDenied"],
+            [null, true, "allowed"]
+          ]
+        }
+      }
+    },
+    {
+      "name": "allow and deny with NotAction succeeds",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "NotAction": "s3:*",
+              "Resource": "*",
+              "Condition": {
+                "StringEqualsIfExists": {
+                  "aws:RequestedRegion": "us-east-1"
+                }
+              }
+            },
+            {
+              "Effect": "Deny",
+              "NotAction": "s3:*",
+              "Resource": "*",
+              "Condition": {
+                "BoolIfExists": {
+                  "aws:SecureTransport": "false"
+                }
+              }
+            }
+          ]
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "effectMode": "allowAndDeny",
+          "columns": [
+            {
+              "key": "aws:RequestedRegion",
+              "label": "aws:RequestedRegion",
+              "valueType": "string"
+            },
+            {
+              "key": "aws:SecureTransport",
+              "label": "aws:SecureTransport",
+              "valueType": "boolean"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            ["us-east-1", false, "explicitlyDenied"],
+            ["us-east-1", true, "allowed"],
+            ["us-other-2", false, "explicitlyDenied"],
+            ["us-other-2", true, "implicitlyDenied"]
+          ]
+        }
+      }
+    },
+    {
+      "name": "allow and deny with Action and NotAction is invalid",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": "s3:PutObject",
+              "NotAction": "ec2:*",
+              "Resource": "*"
+            },
+            {
+              "Effect": "Deny",
+              "Action": "s3:PutObject",
+              "Resource": "*"
+            }
+          ]
+        }
+      },
+      "expected": {
+        "exactResult": {
+          "resultType": "invalidPolicy",
+          "diagnostics": [
+            {
+              "severity": "error",
+              "code": "INVALID_POLICY",
+              "message": "Only one of Action or NotAction is allowed, found both",
+              "path": "Statement[0]",
+              "policyType": "scp"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}
