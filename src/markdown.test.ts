@@ -15,6 +15,7 @@ describe('renderTruthTablesMarkdown', () => {
           effectMode: 'denyOnly',
           testedAction: 's3:PutObject',
           testedResources: ['*'],
+          untestedResources: [],
           columns: [
             { key: 'aws:ResourceOrgID', label: 'Organization ID', valueType: 'string' },
             { key: 'aws:ViaAWSService', label: 'Is Via Service?', valueType: 'boolean' },
@@ -85,6 +86,7 @@ Action tested: \`s3:PutObject\`
             'arn:aws:s3:::example-bucket/first.txt',
             'arn:aws:s3:::example-bucket/second.txt'
           ],
+          untestedResources: [],
           columns: [
             { key: 'resource', label: 'Resource', valueType: 'arn' },
             { key: 'result', label: 'Result', valueType: 'result' }
@@ -128,6 +130,7 @@ Action tested: \`s3:PutObject\`
           effectMode: 'denyOnly',
           testedAction: 's3:PutObject',
           testedResources: ['*'],
+          untestedResources: [],
           columns: [
             { key: 'aws:UserAgent', label: 'User Agent', valueType: 'string' },
             { key: 'result', label: 'Result', valueType: 'result' }
@@ -164,6 +167,7 @@ Action tested: \`s3:PutObject\`
           effectMode: 'denyOnly',
           testedAction: 's3:PutObject',
           testedResources: ['*'],
+          untestedResources: [],
           columns: [
             { key: 'aws:PrincipalOrgPaths', label: 'Principal Org Paths', valueType: 'string' },
             { key: 'result', label: 'Result', valueType: 'result' }
@@ -209,6 +213,7 @@ Action tested: \`s3:PutObject\`
           effectMode: 'denyOnly',
           testedAction: 's3:PutObject',
           testedResources: ['*'],
+          untestedResources: [],
           columns: [
             { key: 'aws:SecureTransport', label: 'Secure Transport', valueType: 'boolean' },
             { key: 'aws:RequestedRegion', label: 'Region', valueType: 'string' },
@@ -242,6 +247,43 @@ Action tested: \`s3:PutObject\`
 
     //Then the any-value cell should render as Any
     expect(markdown).toContain('| false            | Any    | Denied |')
+  })
+
+  it('should render no-testable-resources diagnostics as markdown', () => {
+    //Given a no-testable-resources result with diagnostics
+    const result: GenerateTruthTablesResult = {
+      resultType: 'noTestableResources',
+      testedAction: 's3:GetObject',
+      requestedResources: ['arn:aws:iam::111111111111:role/TestRole'],
+      untestedResources: [
+        {
+          resource: 'arn:aws:iam::111111111111:role/TestRole',
+          reason: 'unsupportedForAction',
+          action: 's3:GetObject',
+          supportedResourceTypes: [
+            { name: 'object', arnPattern: 'arn:${Partition}:s3:::${BucketName}/${ObjectName}' }
+          ]
+        }
+      ],
+      diagnostics: [
+        {
+          severity: 'error',
+          code: 'RESOURCE_UNSUPPORTED_FOR_ACTION',
+          message:
+            'Resource arn:aws:iam::111111111111:role/TestRole cannot be tested with action s3:GetObject.',
+          action: 's3:GetObject',
+          resource: 'arn:aws:iam::111111111111:role/TestRole'
+        }
+      ]
+    }
+
+    //When the result is rendered as Markdown
+    const markdown = renderTruthTablesMarkdown(result)
+
+    //Then it should include the result heading and diagnostics
+    expect(markdown).toBe(
+      '# No Testable Resources\n\n- **error** `RESOURCE_UNSUPPORTED_FOR_ACTION`: Resource arn:aws:iam::111111111111:role/TestRole cannot be tested with action s3:GetObject.'
+    )
   })
 
   it('should render non-success diagnostics as markdown', () => {

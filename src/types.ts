@@ -64,6 +64,7 @@ export type GenerateTruthTablesResult =
   | UnsupportedPolicyTypeTruthTablesResult
   | UnsupportedConditionKeysTruthTablesResult
   | TooManyRowsTruthTablesResult
+  | NoTestableResourcesTruthTablesResult
   | RequestDefaultUnsupportedTruthTablesResult
   | SimulationUnsupportedTruthTablesResult
 
@@ -127,6 +128,24 @@ export interface TooManyRowsTruthTablesResult {
   diagnostics: TruthTableDiagnostic[]
 }
 
+/** Result returned when no requested resources can be tested for the selected action. */
+export interface NoTestableResourcesTruthTablesResult {
+  /** Discriminant for no testable requested resources. */
+  resultType: 'noTestableResources'
+
+  /** IAM action selected for testing. */
+  testedAction: string
+
+  /** Requested resources after default normalization. */
+  requestedResources: string[]
+
+  /** Requested resources that could not be tested. */
+  untestedResources: TruthTableUntestedResource[]
+
+  /** Diagnostics explaining why no resources could be tested. */
+  diagnostics: TruthTableDiagnostic[]
+}
+
 /** Result returned when baseline request defaults cannot be determined. */
 export interface RequestDefaultUnsupportedTruthTablesResult {
   /** Discriminant for unsupported request default inference. */
@@ -164,6 +183,9 @@ export interface PolicyTruthTable {
 
   /** IAM resources used when simulating table rows, in requested evaluation order. */
   testedResources: string[]
+
+  /** Requested resources that were not tested, with validation details. */
+  untestedResources: TruthTableUntestedResource[]
 
   /** Table columns, including condition-key columns and the result column. */
   columns: TruthTableColumn[]
@@ -261,6 +283,30 @@ export interface TruthTableSimplificationSummary {
   simplifiedRowCount: number
 }
 
+/** IAM resource type supported by an action for requested-resource validation. */
+export interface TruthTableSupportedResourceType {
+  /** IAM resource type key from iam-data, such as `object`. */
+  name: string
+
+  /** IAM resource type ARN pattern from iam-data. */
+  arnPattern: string
+}
+
+/** Requested resource that could not be tested for the selected action. */
+export interface TruthTableUntestedResource {
+  /** Requested resource string that was skipped. */
+  resource: string
+
+  /** Reason the resource was not tested. */
+  reason: 'unsupportedForAction'
+
+  /** IAM action the resource could not be tested against. */
+  action: string
+
+  /** Resource types supported by the action. Empty for wildcard-only actions. */
+  supportedResourceTypes: TruthTableSupportedResourceType[]
+}
+
 /** Target-policy statement matched while evaluating a truth-table row. */
 export interface TruthTableMatchedStatement {
   /** Zero-based statement index in the input policy document. */
@@ -303,6 +349,12 @@ export interface TruthTableDiagnostic {
 
   /** Optional policy type related to the diagnostic. */
   policyType?: TruthTablePolicyType | string
+
+  /** Optional IAM action related to the diagnostic. */
+  action?: string
+
+  /** Optional IAM resource related to the diagnostic. */
+  resource?: string
 }
 
 /** Stable diagnostic codes emitted by iam-truth. */
@@ -314,6 +366,7 @@ export type TruthTableDiagnosticCode =
   | 'UNSUPPORTED_OPERATOR'
   | 'ROW_COUNT_WARNING'
   | 'TOO_MANY_ROWS'
+  | 'RESOURCE_UNSUPPORTED_FOR_ACTION'
   | 'REQUEST_DEFAULT_UNSUPPORTED'
   | 'SIMULATION_ERROR'
   | 'IGNORED_CONTEXT_KEY'

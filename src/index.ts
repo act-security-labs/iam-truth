@@ -11,6 +11,7 @@ export type {
   JsonObject,
   JsonPolicyDocument,
   JsonValue,
+  NoTestableResourcesTruthTablesResult,
   PolicyFileInput,
   PolicyTruthTable,
   RequestDefaultUnsupportedTruthTablesResult,
@@ -30,6 +31,8 @@ export type {
   TruthTableScenarioRow,
   TruthTableSimplificationSummary,
   TruthTableSummaryRow,
+  TruthTableSupportedResourceType,
+  TruthTableUntestedResource,
   TruthTableValueType,
   UnsupportedConditionKeysTruthTablesResult,
   UnsupportedPolicyTypeTruthTablesResult
