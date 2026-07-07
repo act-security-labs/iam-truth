@@ -257,6 +257,168 @@ describe('generateTruthTables', () => {
     ])
   })
 
+  it('should skip resources that cannot be tested for the selected action', async () => {
+    //Given a deny-only SCP and one resource that does not match the selected action
+    const policy = {
+      Version: '2012-10-17',
+      Statement: [
+        {
+          Sid: 'DenyReads',
+          Effect: 'Deny',
+          Action: 's3:GetObject',
+          Resource: '*'
+        }
+      ]
+    }
+
+    //When truth tables are generated for one valid and one invalid resource
+    const result = await generateTruthTables({
+      policy,
+      policyType: 'scp',
+      request: {
+        action: 's3:GetObject',
+        resources: [
+          'arn:aws:iam::111111111111:role/TestRole',
+          'arn:aws:s3:::example-bucket/example.txt'
+        ]
+      }
+    })
+
+    //Then it should return rows for the testable resource and diagnostics for the skipped resource
+    expect(result.resultType).toBe('success')
+    if (result.resultType !== 'success') {
+      throw new Error('Expected success')
+    }
+    expect(result.tables[0].testedResources).toEqual(['arn:aws:s3:::example-bucket/example.txt'])
+    expect(result.tables[0].untestedResources).toEqual([
+      {
+        resource: 'arn:aws:iam::111111111111:role/TestRole',
+        reason: 'unsupportedForAction',
+        action: 's3:GetObject',
+        supportedResourceTypes: [
+          {
+            name: 'accesspointobject',
+            arnPattern:
+              'arn:${Partition}:s3:${Region}:${Account}:accesspoint/${AccessPointName}/object/${ObjectName}'
+          },
+          { name: 'object', arnPattern: 'arn:${Partition}:s3:::${BucketName}/${ObjectName}' }
+        ]
+      }
+    ])
+    expect(result.tables[0].columns).toEqual([
+      { key: 'resource', label: 'Resource', valueType: 'arn' },
+      { key: 'result', label: 'Result', valueType: 'result' }
+    ])
+    expect(result.tables[0].rows).toEqual([
+      {
+        rowId: 'row-1',
+        cells: { resource: 'arn:aws:s3:::example-bucket/example.txt', result: 'Denied' },
+        context: {},
+        result: {
+          resultType: 'explicitlyDenied',
+          label: 'Denied',
+          matchedStatements: [{ index: 0, sid: 'DenyReads' }]
+        }
+      }
+    ])
+    expect(result.diagnostics).toEqual([
+      {
+        severity: 'warning',
+        code: 'RESOURCE_UNSUPPORTED_FOR_ACTION',
+        message:
+          'Resource arn:aws:iam::111111111111:role/TestRole cannot be tested with action s3:GetObject.',
+        action: 's3:GetObject',
+        resource: 'arn:aws:iam::111111111111:role/TestRole'
+      }
+    ])
+  })
+
+  it('should return no testable resources when every requested resource is invalid for the action', async () => {
+    //Given a deny-only SCP and only resources that do not match the selected action
+    const policy = {
+      Version: '2012-10-17',
+      Statement: [
+        {
+          Sid: 'DenyReads',
+          Effect: 'Deny',
+          Action: 's3:GetObject',
+          Resource: '*'
+        }
+      ]
+    }
+
+    //When truth tables are generated
+    const result = await generateTruthTables({
+      policy,
+      policyType: 'scp',
+      request: {
+        action: 's3:GetObject',
+        resources: ['arn:aws:iam::111111111111:role/TestRole']
+      }
+    })
+
+    //Then it should return a structured no-testable-resources result
+    expect(result).toEqual({
+      resultType: 'noTestableResources',
+      testedAction: 's3:GetObject',
+      requestedResources: ['arn:aws:iam::111111111111:role/TestRole'],
+      untestedResources: [
+        {
+          resource: 'arn:aws:iam::111111111111:role/TestRole',
+          reason: 'unsupportedForAction',
+          action: 's3:GetObject',
+          supportedResourceTypes: [
+            {
+              name: 'accesspointobject',
+              arnPattern:
+                'arn:${Partition}:s3:${Region}:${Account}:accesspoint/${AccessPointName}/object/${ObjectName}'
+            },
+            { name: 'object', arnPattern: 'arn:${Partition}:s3:::${BucketName}/${ObjectName}' }
+          ]
+        }
+      ],
+      diagnostics: [
+        {
+          severity: 'error',
+          code: 'RESOURCE_UNSUPPORTED_FOR_ACTION',
+          message:
+            'Resource arn:aws:iam::111111111111:role/TestRole cannot be tested with action s3:GetObject.',
+          action: 's3:GetObject',
+          resource: 'arn:aws:iam::111111111111:role/TestRole'
+        }
+      ]
+    })
+  })
+
+  it('should calculate row limits using only testable resources', async () => {
+    //Given a low max row limit with one valid and one invalid resource
+    const policy = denyExternalS3DataAccessPolicy
+
+    //When truth tables are generated
+    const result = await generateTruthTables({
+      policy,
+      policyType: 'scp',
+      request: {
+        resources: [
+          'arn:aws:iam::111111111111:role/TestRole',
+          'arn:aws:s3:::example-bucket/example.txt'
+        ]
+      },
+      options: { maxRows: 6 }
+    })
+
+    //Then the valid resource rows should be returned instead of failing based on requested resource count
+    expect(result.resultType).toBe('success')
+    if (result.resultType !== 'success') {
+      throw new Error('Expected success')
+    }
+    expect(result.tables[0].rows.length).toBe(6)
+    expect(result.tables[0].testedResources).toEqual(['arn:aws:s3:::example-bucket/example.txt'])
+    expect(result.tables[0].untestedResources.map((resource) => resource.resource)).toEqual([
+      'arn:aws:iam::111111111111:role/TestRole'
+    ])
+  })
+
   it('should return too many rows before simulation when the row limit is exceeded', async () => {
     //Given a low max row limit and two requested resources
     const policy = denyExternalS3DataAccessPolicy

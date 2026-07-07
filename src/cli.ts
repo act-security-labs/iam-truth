@@ -11,6 +11,7 @@ import {
 import { generateTruthTables } from './generateTruthTables.js'
 import { parseJsonPolicyDocument, policyJsonFileArgument } from './jsonFileArgument.js'
 import { renderTruthTablesMarkdown } from './markdown.js'
+import { type GenerateTruthTablesResult } from './types.js'
 
 /** Runs the iam-truth CLI. */
 async function run(): Promise<void> {
@@ -82,10 +83,27 @@ async function run(): Promise<void> {
     }
   })
 
+  printResourceValidationDiagnostics(result)
+
   if (cli.args.output === 'md') {
     console.log(renderTruthTablesMarkdown(result))
   } else {
     console.log(JSON.stringify(result, null, 2))
+  }
+}
+
+/**
+ * Prints resource validation diagnostics to stderr while keeping rendered results on stdout.
+ *
+ * Partial success and no-testable-resources results both carry these diagnostics.
+ *
+ * @param result - Truth-table generation result to inspect.
+ */
+function printResourceValidationDiagnostics(result: GenerateTruthTablesResult): void {
+  for (const diagnostic of result.diagnostics) {
+    if (diagnostic.code === 'RESOURCE_UNSUPPORTED_FOR_ACTION') {
+      console.error(diagnostic.message)
+    }
   }
 }
 

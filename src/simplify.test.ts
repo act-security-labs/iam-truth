@@ -298,6 +298,7 @@ function tableWithRows(conditionKeys: string[], rows: TruthTableScenarioRow[]): 
     effectMode: 'denyOnly',
     testedAction: 's3:PutObject',
     testedResources: ['*'],
+    untestedResources: [],
     columns,
     rows
   }

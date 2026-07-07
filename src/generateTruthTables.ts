@@ -9,6 +9,7 @@ import { extractConditionKeysFromStatements } from './conditionKeys.js'
 import { policyEffectMode } from './effectMode.js'
 import { validateConditionOperators } from './operators.js'
 import { resolveBaselineRequest } from './requestDefaults.js'
+import { validateResourcesForAction } from './resourceValidation.js'
 import { generateScenarios } from './scenarios.js'
 import { simplifyTruthTable } from './simplify.js'
 import { simulateScenario } from './simulation.js'
@@ -20,7 +21,8 @@ import {
   type JsonPolicyDocument,
   type TruthTableDiagnostic,
   type TruthTablePolicyType,
-  type TruthTableRow
+  type TruthTableRow,
+  type TruthTableUntestedResource
 } from './types.js'
 
 const DEFAULT_WARN_AT_ROWS = 25
@@ -73,6 +75,29 @@ export async function generateTruthTables(
     return { resultType: 'requestDefaultUnsupported', diagnostics: baselineRequest.diagnostics }
   }
 
+  const resourceValidation = await validateResourcesForAction(
+    baselineRequest.request.action,
+    baselineRequest.resources
+  )
+  const resources =
+    resourceValidation.resultType === 'validated'
+      ? resourceValidation.testableResources
+      : baselineRequest.resources
+  const untestedResources =
+    resourceValidation.resultType === 'validated' ? resourceValidation.untestedResources : []
+  const resourceDiagnostics = resourceValidationDiagnostics(untestedResources, resources.length > 0)
+  if (resources.length === 0) {
+    return {
+      resultType: 'noTestableResources',
+      testedAction: baselineRequest.request.action,
+      requestedResources: baselineRequest.resources,
+      untestedResources,
+      diagnostics: resourceDiagnostics
+    }
+  }
+
+  const requestForScenarioMetadata = { ...baselineRequest.request, resource: resources[0] }
+
   const effectMode = policyEffectMode(input.policy)
   const applicableStatements = statementsApplicableToAction(
     loadPolicy(input.policy).statements(),
@@ -86,14 +111,16 @@ export async function generateTruthTables(
       policyType: input.policyType,
       requestModel: requestModelForPolicyType(input.policyType),
       action: baselineRequest.request.action,
-      resource: baselineRequest.request.resource
+      resource: requestForScenarioMetadata.resource
     }
   })
-  const diagnostics: TruthTableDiagnostic[] = [...scenarioResult.diagnostics]
+  const diagnostics: TruthTableDiagnostic[] = [
+    ...resourceDiagnostics,
+    ...scenarioResult.diagnostics
+  ]
 
   const maxRows = input.options?.maxRows ?? DEFAULT_MAX_ROWS
   const warnAtRows = input.options?.warnAtRows ?? DEFAULT_WARN_AT_ROWS
-  const resources = baselineRequest.resources
   const rowCount = scenarioResult.scenarios.length * resources.length
   if (rowCount > maxRows) {
     return {
@@ -121,7 +148,7 @@ export async function generateTruthTables(
   }
 
   const rows: TruthTableRow[] = []
-  const includeResourceColumn = resources.length > 1
+  const includeResourceColumn = baselineRequest.resources.length > 1
   for (const scenario of scenarioResult.scenarios) {
     for (const resource of resources) {
       const resourceRequest = { ...baselineRequest.request, resource }
@@ -159,6 +186,7 @@ export async function generateTruthTables(
     effectMode,
     testedAction: baselineRequest.request.action,
     testedResources: resources,
+    untestedResources,
     columns: columnsForScenarioMetadata(scenarioResult.metadata, includeResourceColumn),
     rows
   }
@@ -168,6 +196,26 @@ export async function generateTruthTables(
   }
 
   return { resultType: 'success', tables: [table], diagnostics }
+}
+
+/**
+ * Builds diagnostics for requested resources that cannot be tested.
+ *
+ * @param untestedResources - Untested resource validation records.
+ * @param hasTestableResources - Whether at least one resource can still be tested.
+ * @returns Diagnostics describing untested resources.
+ */
+function resourceValidationDiagnostics(
+  untestedResources: TruthTableUntestedResource[],
+  hasTestableResources: boolean
+): TruthTableDiagnostic[] {
+  return untestedResources.map((untestedResource) => ({
+    severity: hasTestableResources ? ('warning' as const) : ('error' as const),
+    code: 'RESOURCE_UNSUPPORTED_FOR_ACTION' as const,
+    message: `Resource ${untestedResource.resource} cannot be tested with action ${untestedResource.action}.`,
+    action: untestedResource.action,
+    resource: untestedResource.resource
+  }))
 }
 
 /**
