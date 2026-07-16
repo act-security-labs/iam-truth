@@ -165,7 +165,9 @@ function matchingValueFromString(
     return { cellValue: ipValue, contextValue: ipValue }
   }
   if (operator.includes('like')) {
-    const likeValue = matchingLikeValue(value)
+    const likeValue = operator.includes('arn')
+      ? matchingArnLikeValue(value)
+      : matchingLikeValue(value)
     return { cellValue: likeValue, contextValue: likeValue }
   }
   return { cellValue: value, contextValue: value }
@@ -280,6 +282,52 @@ function nonMatchingLikeValue(conditionKey: ExtractedConditionKey): ScenarioValu
 export function matchingLikeValue(pattern: string): string {
   const value = pattern.replace(/\*/g, 'example').replace(/\?/g, 'x')
   return value.length > 0 ? value : 'example'
+}
+
+/**
+ * Creates a deterministic string value intended to match an IAM ArnLike pattern.
+ *
+ * @param pattern - IAM ArnLike pattern using `*` and `?` wildcards.
+ * @returns A concrete ARN-like value that should match the pattern.
+ */
+function matchingArnLikeValue(pattern: string): string {
+  if (!pattern.toLowerCase().startsWith('arn:')) {
+    return matchingLikeValue(pattern)
+  }
+
+  const arnParts = pattern.split(':')
+  const accountIdIndex = 4
+  if (arnParts[accountIdIndex] && /^\*+$/.test(arnParts[accountIdIndex])) {
+    arnParts[accountIdIndex] = '111111111111'
+  }
+  return matchingLikeValue(arnParts.join(':'))
+}
+
+/**
+ * Creates a present value for Null-operator scenario generation.
+ *
+ * @param conditionKey - Extracted condition-key policy values.
+ * @param metadata - Scenario metadata used to choose a present value shape.
+ * @returns Present scenario value for the condition key.
+ */
+function nullOperatorPresentValue(
+  conditionKey: ExtractedConditionKey,
+  metadata: ConditionKeyScenarioMetadata
+): ScenarioValue {
+  if (metadata.valueType === 'boolean') {
+    return { cellValue: true, contextValue: 'true' }
+  }
+
+  const presentContextValue = fakeConditionKeyValue({
+    conditionKey: conditionKey.key,
+    valueType: metadata.valueType,
+    existingValues: conditionKey.values,
+    role: 'present'
+  })
+  return {
+    cellValue: presentContextValue,
+    contextValue: metadata.supportsMultipleValues ? [presentContextValue] : presentContextValue
+  }
 }
 
 /**
@@ -416,16 +464,7 @@ function nullOperatorValues(
   metadata: ConditionKeyScenarioMetadata
 ): ScenarioValue[] {
   const wantsMissing = conditionKey.values.some((value) => value.toLowerCase() === 'true')
-  const presentContextValue = fakeConditionKeyValue({
-    conditionKey: conditionKey.key,
-    valueType: metadata.valueType,
-    existingValues: conditionKey.values,
-    role: 'present'
-  })
-  const presentValue = {
-    cellValue: presentContextValue,
-    contextValue: metadata.supportsMultipleValues ? [presentContextValue] : presentContextValue
-  }
+  const presentValue = nullOperatorPresentValue(conditionKey, metadata)
   const missingValue = { cellValue: null, contextValue: undefined }
   return wantsMissing ? [missingValue, presentValue] : [presentValue, missingValue]
 }
