@@ -1,0 +1,63 @@
+{
+  "description": "Combined aws:PrincipalArn and aws:AssumedRoot scenario values",
+  "cases": [
+    {
+      "name": "uses account-shaped PrincipalArn and true AssumedRoot values",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Deny",
+              "Action": "*",
+              "Resource": "*",
+              "Condition": {
+                "ArnLike": {
+                  "aws:PrincipalArn": ["arn:aws:iam::*:root"]
+                },
+                "Null": {
+                  "aws:AssumedRoot": "true"
+                }
+              }
+            }
+          ]
+        },
+        "request": {
+          "action": "a2c:GetContainerizationJobDetails"
+        },
+        "options": {
+          "maxRows": 1000
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "columns": [
+            {
+              "key": "aws:PrincipalArn",
+              "label": "aws:PrincipalArn",
+              "valueType": "arn"
+            },
+            {
+              "key": "aws:AssumedRoot",
+              "label": "aws:AssumedRoot",
+              "valueType": "boolean"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            ["arn:aws:iam::111111111111:root", null, "explicitlyDenied"],
+            ["arn:aws:iam::111111111111:root", true, "notDenied"],
+            ["arn:aws:iam::222222222222:role/OtherRole", null, "notDenied"],
+            ["arn:aws:iam::222222222222:role/OtherRole", true, "notDenied"]
+          ]
+        }
+      }
+    }
+  ]
+}

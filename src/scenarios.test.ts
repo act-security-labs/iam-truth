@@ -146,6 +146,33 @@ describe('generateScenarios', () => {
     ])
   })
 
+  it('should generate account-shaped matching values for ArnLike account wildcards', async () => {
+    //Given an ArnLike operator with a wildcard account-id segment
+    const conditionKeys = extractConditionKeys({
+      Statement: [
+        {
+          Effect: 'Deny',
+          Action: 's3:PutObject',
+          Resource: '*',
+          Condition: {
+            ArnLike: {
+              'aws:PrincipalArn': 'arn:aws:iam::*:root'
+            }
+          }
+        }
+      ]
+    })
+
+    //When scenarios are generated
+    const result = await generateScenarios(conditionKeys)
+
+    //Then the matching scenario should use a valid-looking AWS account root ARN
+    expect(result.scenarios.map((scenario) => scenario.cells)).toEqual([
+      { 'aws:PrincipalArn': 'arn:aws:iam::111111111111:root' },
+      { 'aws:PrincipalArn': 'arn:aws:iam::222222222222:role/OtherRole' }
+    ])
+  })
+
   it('should keep set-operator scenarios scalar for scalar condition keys', async () => {
     //Given a scalar condition key with a ForAnyValue operator
     const conditionKeys = extractConditionKeys({
@@ -198,6 +225,34 @@ describe('generateScenarios', () => {
       { 'aws:SourceIdentity': null },
       { 'aws:SourceIdentity': 'alice' }
     ])
+  })
+
+  it('should generate boolean present values for Null operators on boolean keys', async () => {
+    //Given a Null operator that checks whether a boolean context key is absent
+    const conditionKeys = extractConditionKeys({
+      Statement: [
+        {
+          Effect: 'Deny',
+          Action: 's3:PutObject',
+          Resource: '*',
+          Condition: {
+            Null: {
+              'aws:AssumedRoot': 'true'
+            }
+          }
+        }
+      ]
+    })
+
+    //When scenarios are generated
+    const result = await generateScenarios(conditionKeys)
+
+    //Then missing and present scenarios should be generated with a typed boolean present value
+    expect(result.scenarios.map((scenario) => scenario.cells)).toEqual([
+      { 'aws:AssumedRoot': null },
+      { 'aws:AssumedRoot': true }
+    ])
+    expect(result.scenarios[1].context).toEqual({ 'aws:AssumedRoot': 'true' })
   })
 
   it('should generate same above below and missing scenarios for numeric comparison operators', async () => {
