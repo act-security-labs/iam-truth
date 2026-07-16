@@ -1,3 +1,10 @@
+## [0.1.5](https://github.com/cloud-copilot/iam-truth/compare/v0.1.4...v0.1.5) (2026-07-16)
+
+
+### Bug Fixes
+
+* improve assumed root truth table values ([3e4d7db](https://github.com/cloud-copilot/iam-truth/commit/3e4d7dbd3611b8098359c1e86d72cc89fd6960d6))
+
 ## [0.1.4](https://github.com/cloud-copilot/iam-truth/compare/v0.1.3...v0.1.4) (2026-07-11)
 
 ## [0.1.3](https://github.com/cloud-copilot/iam-truth/compare/v0.1.2...v0.1.3) (2026-07-07)
