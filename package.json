@@ -1,6 +1,6 @@
 {
   "name": "@cloud-copilot/iam-truth",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "Generate truth tables that explain AWS IAM policy behavior",
   "repository": {
     "type": "git",
