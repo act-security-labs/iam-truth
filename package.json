@@ -41,10 +41,10 @@
   "homepage": "https://github.com/cloud-copilot/iam-truth#readme",
   "dependencies": {
     "@cloud-copilot/cli": "^0.2.46",
-    "@cloud-copilot/iam-data": ">=0.19.202604231 <1.0.0",
+    "@cloud-copilot/iam-data": ">=0.20.202607211 <1.0.0",
     "@cloud-copilot/iam-expand": "^0.11.62",
     "@cloud-copilot/iam-policy": "^0.1.89",
-    "@cloud-copilot/iam-simulate": "^0.1.153",
+    "@cloud-copilot/iam-simulate": "^0.1.160",
     "@cloud-copilot/iam-utils": "^0.1.63"
   },
   "devDependencies": {
