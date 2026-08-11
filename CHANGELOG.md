@@ -1,3 +1,10 @@
+## [0.1.11](https://github.com/cloud-copilot/iam-truth/compare/v0.1.10...v0.1.11) (2026-08-11)
+
+
+### Features
+
+* use resource info action exclusions for scenarios ([8893ce9](https://github.com/cloud-copilot/iam-truth/commit/8893ce90b5b8b23448bcc5a961147942a1c47cde))
+
 ## [0.1.10](https://github.com/cloud-copilot/iam-truth/compare/v0.1.9...v0.1.10) (2026-08-08)
 
 ## [0.1.9](https://github.com/cloud-copilot/iam-truth/compare/v0.1.8...v0.1.9) (2026-08-01)
