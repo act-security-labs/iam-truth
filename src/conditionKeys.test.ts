@@ -84,47 +84,33 @@ describe('shouldIncludeMissingScenario', () => {
     expect(result).toBe(true)
   })
 
-  it('should not include missing ResourceAccount scenarios for supported generated RCP actions', () => {
-    //Given ResourceAccount in a supported RCP action
-    const conditionKey: ExtractedConditionKey = {
-      key: 'aws:ResourceAccount',
-      operators: ['StringEquals'],
-      values: ['111111111111'],
-      paths: ['Statement.Condition.StringEquals.aws:ResourceAccount']
+  it.each([
+    { key: 'aws:ResourceAccount', includeMissing: false },
+    { key: 'aws:ResourceOrgID', includeMissing: true },
+    { key: 'aws:ResourceOrgPaths', includeMissing: true }
+  ])(
+    'should set supported generated RCP missing scenario availability for $key',
+    ({ key, includeMissing }) => {
+      //Given a resource-info key in a supported RCP action
+      const conditionKey: ExtractedConditionKey = {
+        key,
+        operators: ['StringEquals'],
+        values: ['cloud-copilot-example-value'],
+        paths: [`Statement.Condition.StringEquals.${key}`]
+      }
+
+      //When missing scenario inclusion is checked for RCP
+      const result = shouldIncludeMissingScenario(conditionKey, {
+        policyType: 'rcp',
+        requestModel: 'generatedSignedRcpRequest',
+        action: 's3:GetObject',
+        resource: 'arn:aws:s3:::example-bucket/example.txt'
+      })
+
+      //Then ResourceAccount is present-only, while organization keys may be absent
+      expect(result).toBe(includeMissing)
     }
-
-    //When missing scenario inclusion is checked for RCP
-    const result = shouldIncludeMissingScenario(conditionKey, {
-      policyType: 'rcp',
-      requestModel: 'generatedSignedRcpRequest',
-      action: 's3:GetObject',
-      resource: 'arn:aws:s3:::example-bucket/example.txt'
-    })
-
-    //Then ResourceAccount should be generated as present-only
-    expect(result).toBe(false)
-  })
-
-  it('should include missing ResourceOrgID scenarios for supported generated RCP actions', () => {
-    //Given ResourceOrgID in a supported RCP action
-    const conditionKey: ExtractedConditionKey = {
-      key: 'aws:ResourceOrgID',
-      operators: ['StringEquals'],
-      values: ['o-example'],
-      paths: ['Statement.Condition.StringEquals.aws:ResourceOrgID']
-    }
-
-    //When missing scenario inclusion is checked for RCP
-    const result = shouldIncludeMissingScenario(conditionKey, {
-      policyType: 'rcp',
-      requestModel: 'generatedSignedRcpRequest',
-      action: 's3:GetObject',
-      resource: 'arn:aws:s3:::example-bucket/example.txt'
-    })
-
-    //Then ResourceOrgID can be missing if the resource account is not in an organization
-    expect(result).toBe(true)
-  })
+  )
 })
 
 describe('shouldOnlyGenerateMissingScenario', () => {

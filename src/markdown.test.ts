@@ -17,7 +17,7 @@ describe('renderTruthTablesMarkdown', () => {
           testedResources: ['*'],
           untestedResources: [],
           columns: [
-            { key: 'aws:ResourceOrgID', label: 'Organization ID', valueType: 'string' },
+            { key: 'aws:ResourceOrgID', label: 'Resource Org ID', valueType: 'string' },
             { key: 'aws:ViaAWSService', label: 'Is Via Service?', valueType: 'boolean' },
             { key: 'result', label: 'Result', valueType: 'result' }
           ],
@@ -65,7 +65,7 @@ describe('renderTruthTablesMarkdown', () => {
 
 Action tested: \`s3:PutObject\`
 
-| Organization ID | Is Via Service? | Result     |
+| Resource Org ID | Is Via Service? | Result     |
 | --------------- | --------------- | ---------- |
 | o-h2owf1zaat    | true            | Not Denied |
 | None            | false           | Denied     |`)

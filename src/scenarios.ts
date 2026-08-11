@@ -456,8 +456,8 @@ function policyValuesForScenarioGeneration(
  * Generates present/missing values for the Null condition operator.
  *
  * @param conditionKey - Extracted condition-key policy values.
- * @param metadata - Scenario metadata used to choose a present value shape.
- * @returns Scenario values that exercise present and missing states.
+ * @param metadata - Scenario metadata used to choose a present value shape and missing-key availability.
+ * @returns Scenario values that exercise allowed present and missing states.
  */
 function nullOperatorValues(
   conditionKey: ExtractedConditionKey,
@@ -465,6 +465,10 @@ function nullOperatorValues(
 ): ScenarioValue[] {
   const wantsMissing = conditionKey.values.some((value) => value.toLowerCase() === 'true')
   const presentValue = nullOperatorPresentValue(conditionKey, metadata)
+  if (!metadata.includeMissing) {
+    return [presentValue]
+  }
+
   const missingValue = { cellValue: null, contextValue: undefined }
   return wantsMissing ? [missingValue, presentValue] : [presentValue, missingValue]
 }

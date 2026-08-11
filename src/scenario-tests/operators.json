@@ -1489,7 +1489,7 @@
           "columns": [
             {
               "key": "aws:PrincipalOrgPaths",
-              "label": "Principal Organization Paths",
+              "label": "Principal Org Paths",
               "valueType": "string"
             },
             {
@@ -1541,7 +1541,7 @@
           "columns": [
             {
               "key": "aws:PrincipalOrgPaths",
-              "label": "Principal Organization Paths",
+              "label": "Principal Org Paths",
               "valueType": "string"
             },
             {

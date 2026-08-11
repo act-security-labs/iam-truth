@@ -1,6 +1,6 @@
 import { findConditionKey } from '@cloud-copilot/iam-data'
 import { loadPolicy, type Statement } from '@cloud-copilot/iam-policy'
-import { actionSupportsAwsResourceInfoContextKeys } from '@cloud-copilot/iam-utils'
+import { isAwsResourceInfoExcludedAction } from '@cloud-copilot/iam-utils'
 import {
   globalConditionKeyScenarioMetadata,
   type GlobalConditionKeyScenarioMetadata
@@ -297,7 +297,7 @@ function resourceInfoKeyAvailability(
   if (requestContext.requestModel !== 'generatedSignedRcpRequest') {
     return 'notResourceInfoKey'
   }
-  return actionSupportsAwsResourceInfoContextKeys(requestContext.action) ? 'present' : 'missing'
+  return isAwsResourceInfoExcludedAction(requestContext.action) ? 'missing' : 'present'
 }
 
 /**
@@ -334,12 +334,12 @@ function rcpPrincipalKeyCanBeMissing(
  */
 function labelForConditionKey(key: string): string {
   const knownLabels: Record<string, string> = {
-    'aws:resourceorgid': 'Organization ID',
+    'aws:resourceorgid': 'Resource Org ID',
     'aws:viaawsservice': 'Is Via Service?',
-    'aws:principalorgid': 'Principal Organization ID',
+    'aws:principalorgid': 'Principal Org ID',
     'aws:principalisawsservice': 'Is AWS Service Principal?',
-    'aws:resourceorgpaths': 'Resource Organization Paths',
-    'aws:principalorgpaths': 'Principal Organization Paths'
+    'aws:resourceorgpaths': 'Resource Org Paths',
+    'aws:principalorgpaths': 'Principal Org Paths'
   }
   return knownLabels[key.toLowerCase()] ?? key
 }

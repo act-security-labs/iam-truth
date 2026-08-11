@@ -140,7 +140,7 @@
           "columns": [
             {
               "key": "aws:PrincipalOrgID",
-              "label": "Principal Organization ID",
+              "label": "Principal Org ID",
               "valueType": "string"
             },
             {

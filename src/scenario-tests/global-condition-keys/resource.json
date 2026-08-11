@@ -82,7 +82,7 @@
           "columns": [
             {
               "key": "aws:ResourceOrgID",
-              "label": "Organization ID",
+              "label": "Resource Org ID",
               "valueType": "string"
             },
             {
@@ -131,7 +131,7 @@
           "columns": [
             {
               "key": "aws:ResourceOrgPaths",
-              "label": "Resource Organization Paths",
+              "label": "Resource Org Paths",
               "valueType": "string"
             },
             {
