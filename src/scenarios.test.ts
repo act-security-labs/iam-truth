@@ -255,6 +255,69 @@ describe('generateScenarios', () => {
     expect(result.scenarios[1].context).toEqual({ 'aws:AssumedRoot': 'true' })
   })
 
+  it('should generate supported RCP Null-operator scenarios for resource-info key availability', async () => {
+    //Given Null operators for resource-info keys on a supported generated RCP action
+    const conditionKeys = extractConditionKeys({
+      Statement: [
+        {
+          Effect: 'Deny',
+          Principal: '*',
+          Action: 's3:GetObject',
+          Resource: '*',
+          Condition: {
+            Null: {
+              'aws:ResourceAccount': 'true',
+              'aws:ResourceOrgID': 'true',
+              'aws:ResourceOrgPaths': 'true'
+            }
+          }
+        }
+      ]
+    })
+
+    //When scenarios are generated with supported RCP request metadata
+    const result = await generateScenarios(conditionKeys, {
+      requestContext: {
+        policyType: 'rcp',
+        requestModel: 'generatedSignedRcpRequest',
+        action: 's3:GetObject',
+        resource: 'arn:aws:s3:::example-bucket/example.txt'
+      }
+    })
+
+    //Then ResourceAccount should be present-only while organization keys also include missing scenarios
+    expect(result.scenarios.map((scenario) => scenario.cells)).toEqual([
+      {
+        'aws:ResourceAccount': '111111111111',
+        'aws:ResourceOrgID': null,
+        'aws:ResourceOrgPaths': null
+      },
+      {
+        'aws:ResourceAccount': '111111111111',
+        'aws:ResourceOrgID': null,
+        'aws:ResourceOrgPaths': 'o-exampleorg/r-root/ou-root-security/'
+      },
+      {
+        'aws:ResourceAccount': '111111111111',
+        'aws:ResourceOrgID': 'o-exampleorg',
+        'aws:ResourceOrgPaths': null
+      },
+      {
+        'aws:ResourceAccount': '111111111111',
+        'aws:ResourceOrgID': 'o-exampleorg',
+        'aws:ResourceOrgPaths': 'o-exampleorg/r-root/ou-root-security/'
+      }
+    ])
+    expect(result.scenarios[0].context).toEqual({
+      'aws:ResourceAccount': '111111111111'
+    })
+    expect(result.scenarios[3].context).toEqual({
+      'aws:ResourceAccount': '111111111111',
+      'aws:ResourceOrgID': 'o-exampleorg',
+      'aws:ResourceOrgPaths': ['o-exampleorg/r-root/ou-root-security/']
+    })
+  })
+
   it('should generate same above below and missing scenarios for numeric comparison operators', async () => {
     //Given a numeric less-than operator
     const conditionKeys = extractConditionKeys({

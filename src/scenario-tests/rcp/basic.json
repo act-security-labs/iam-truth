@@ -182,12 +182,12 @@
             },
             {
               "key": "aws:ResourceOrgID",
-              "label": "Organization ID",
+              "label": "Resource Org ID",
               "valueType": "string"
             },
             {
               "key": "aws:ResourceOrgPaths",
-              "label": "Resource Organization Paths",
+              "label": "Resource Org Paths",
               "valueType": "string"
             },
             {
@@ -197,6 +197,156 @@
             }
           ],
           "rows": [[null, null, null, "explicitlyDenied"]]
+        }
+      }
+    },
+    {
+      "name": "RCP supported action keeps ResourceAccount present for Null conditions",
+      "input": {
+        "policyType": "rcp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Sid": "DenyMissingResourceAccount",
+              "Effect": "Deny",
+              "Principal": "*",
+              "Action": "s3:GetObject",
+              "Resource": "*",
+              "Condition": {
+                "Null": {
+                  "aws:ResourceAccount": "true"
+                }
+              }
+            }
+          ]
+        },
+        "request": {
+          "action": "s3:GetObject",
+          "resources": ["arn:aws:s3:::example-bucket/example.txt"]
+        },
+        "options": {
+          "maxRows": 1000
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "columns": [
+            {
+              "key": "aws:ResourceAccount",
+              "label": "aws:ResourceAccount",
+              "valueType": "string"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [["111111111111", "notDenied"]]
+        }
+      }
+    },
+    {
+      "name": "RCP supported action includes missing ResourceOrgID scenarios",
+      "input": {
+        "policyType": "rcp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Sid": "DenyMissingResourceOrgId",
+              "Effect": "Deny",
+              "Principal": "*",
+              "Action": "s3:GetObject",
+              "Resource": "*",
+              "Condition": {
+                "Null": {
+                  "aws:ResourceOrgID": "true"
+                }
+              }
+            }
+          ]
+        },
+        "request": {
+          "action": "s3:GetObject",
+          "resources": ["arn:aws:s3:::example-bucket/example.txt"]
+        },
+        "options": {
+          "maxRows": 1000
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "columns": [
+            {
+              "key": "aws:ResourceOrgID",
+              "label": "Resource Org ID",
+              "valueType": "string"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            [null, "explicitlyDenied"],
+            ["o-exampleorg", "notDenied"]
+          ]
+        }
+      }
+    },
+    {
+      "name": "RCP supported action includes missing ResourceOrgPaths scenarios",
+      "input": {
+        "policyType": "rcp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Sid": "DenyMissingResourceOrgPaths",
+              "Effect": "Deny",
+              "Principal": "*",
+              "Action": "s3:GetObject",
+              "Resource": "*",
+              "Condition": {
+                "Null": {
+                  "aws:ResourceOrgPaths": "true"
+                }
+              }
+            }
+          ]
+        },
+        "request": {
+          "action": "s3:GetObject",
+          "resources": ["arn:aws:s3:::example-bucket/example.txt"]
+        },
+        "options": {
+          "maxRows": 1000
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "columns": [
+            {
+              "key": "aws:ResourceOrgPaths",
+              "label": "Resource Org Paths",
+              "valueType": "string"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            [null, "explicitlyDenied"],
+            ["o-exampleorg/r-root/ou-root-security/", "notDenied"]
+          ]
         }
       }
     },

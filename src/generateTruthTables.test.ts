@@ -38,7 +38,7 @@ describe('generateTruthTables', () => {
     expect(result.tables[0].testedAction).toBe('s3:PutObject')
     expect(result.tables[0].testedResources).toEqual(['*'])
     expect(result.tables[0].columns).toEqual([
-      { key: 'aws:ResourceOrgID', label: 'Organization ID', valueType: 'string' },
+      { key: 'aws:ResourceOrgID', label: 'Resource Org ID', valueType: 'string' },
       { key: 'aws:ViaAWSService', label: 'Is Via Service?', valueType: 'boolean' },
       { key: 'result', label: 'Result', valueType: 'result' }
     ])

@@ -73,7 +73,7 @@ For successful truth-table cases, prefer the compact table format:
     "columns": [
       {
         "key": "aws:ResourceOrgID",
-        "label": "Organization ID",
+        "label": "Resource Org ID",
         "valueType": "string"
       },
       {
