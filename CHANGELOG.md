@@ -1,3 +1,5 @@
+## [0.1.12](https://github.com/cloud-copilot/iam-truth/compare/v0.1.11...v0.1.12) (2026-08-15)
+
 ## [0.1.11](https://github.com/cloud-copilot/iam-truth/compare/v0.1.10...v0.1.11) (2026-08-11)
 
 
