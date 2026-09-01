@@ -210,7 +210,7 @@
               "Resource": "*",
               "Condition": {
                 "StringLike": {
-                  "aws:SourceIdentity": "cloud-copilot-*"
+                  "aws:SourceIdentity": "act-security-*"
                 }
               }
             }
@@ -239,8 +239,8 @@
             }
           ],
           "rows": [
-            ["cloud-copilot-example", "explicitlyDenied"],
-            ["not-cloud-copilot-example", "notDenied"],
+            ["act-security-example", "explicitlyDenied"],
+            ["not-act-security-example", "notDenied"],
             [null, "notDenied"]
           ]
         }
@@ -259,7 +259,7 @@
               "Resource": "*",
               "Condition": {
                 "StringNotLike": {
-                  "aws:SourceIdentity": "cloud-copilot-*"
+                  "aws:SourceIdentity": "act-security-*"
                 }
               }
             }
@@ -288,8 +288,8 @@
             }
           ],
           "rows": [
-            ["cloud-copilot-example", "notDenied"],
-            ["not-cloud-copilot-example", "explicitlyDenied"],
+            ["act-security-example", "notDenied"],
+            ["not-act-security-example", "explicitlyDenied"],
             [null, "explicitlyDenied"]
           ]
         }

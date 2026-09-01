@@ -129,7 +129,7 @@ describe('generateScenarios', () => {
           Resource: '*',
           Condition: {
             StringLike: {
-              'aws:UserAgent': 'cloud-copilot-*'
+              'aws:UserAgent': 'act-security-*'
             }
           }
         }
@@ -141,8 +141,8 @@ describe('generateScenarios', () => {
 
     //Then the alternate scenario should not match the policy pattern
     expect(result.scenarios.map((scenario) => scenario.cells)).toEqual([
-      { 'aws:UserAgent': 'cloud-copilot-example' },
-      { 'aws:UserAgent': 'not-cloud-copilot-example' }
+      { 'aws:UserAgent': 'act-security-example' },
+      { 'aws:UserAgent': 'not-act-security-example' }
     ])
   })
 
@@ -183,7 +183,7 @@ describe('generateScenarios', () => {
           Resource: '*',
           Condition: {
             'ForAnyValue:StringEquals': {
-              'aws:UserAgent': 'cloud-copilot-example-value'
+              'aws:UserAgent': 'act-security-example-value'
             }
           }
         }
@@ -195,7 +195,7 @@ describe('generateScenarios', () => {
 
     //Then scalar metadata should prevent multivalue array generation
     expect(result.scenarios.map((scenario) => scenario.cells)).toEqual([
-      { 'aws:UserAgent': 'cloud-copilot-example-value' },
+      { 'aws:UserAgent': 'act-security-example-value' },
       { 'aws:UserAgent': 'aws-sdk-js/3.x' }
     ])
   })
@@ -477,7 +477,7 @@ describe('generateScenarios', () => {
           Resource: '*',
           Condition: {
             StringEqualsIfExists: {
-              'aws:SourceVpc': 'cloud-copilot-example-value'
+              'aws:SourceVpc': 'act-security-example-value'
             }
           }
         }
@@ -489,7 +489,7 @@ describe('generateScenarios', () => {
 
     //Then the generated alternate should not collapse into the policy value
     expect(result.scenarios.map((scenario) => scenario.cells)).toEqual([
-      { 'aws:SourceVpc': 'cloud-copilot-example-value' },
+      { 'aws:SourceVpc': 'act-security-example-value' },
       { 'aws:SourceVpc': 'vpc-0fedcba9876543210' },
       { 'aws:SourceVpc': null }
     ])
@@ -498,7 +498,7 @@ describe('generateScenarios', () => {
 
 describe('StringLike scenario value helpers', () => {
   it.each([
-    ['cloud-copilot-*', 'cloud-copilot-example'],
+    ['act-security-*', 'act-security-example'],
     ['*-suffix', 'example-suffix'],
     ['prefix-*', 'prefix-example'],
     ['prefix-*-suffix', 'prefix-example-suffix'],
@@ -516,7 +516,7 @@ describe('StringLike scenario value helpers', () => {
   })
 
   it.each([
-    ['cloud-copilot-*'],
+    ['act-security-*'],
     ['*-suffix'],
     ['prefix-*'],
     ['prefix-*-suffix'],
@@ -534,7 +534,7 @@ describe('StringLike scenario value helpers', () => {
 
   it('should create a value that avoids all policy Like patterns', () => {
     //Given multiple Like patterns for the same condition key
-    const patterns = ['cloud-copilot-*', '*-suffix', 'prefix-?-middle']
+    const patterns = ['act-security-*', '*-suffix', 'prefix-?-middle']
 
     //When a non-matching Like value is generated
     const result = firstNonMatchingLikeValue(patterns)
