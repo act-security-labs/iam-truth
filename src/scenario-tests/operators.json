@@ -206,7 +206,7 @@
               "Resource": "*",
               "Condition": {
                 "StringLike": {
-                  "aws:UserAgent": "cloud-copilot-*"
+                  "aws:UserAgent": "act-security-*"
                 }
               }
             }
@@ -235,8 +235,8 @@
             }
           ],
           "rows": [
-            ["cloud-copilot-example", "explicitlyDenied"],
-            ["not-cloud-copilot-example", "notDenied"]
+            ["act-security-example", "explicitlyDenied"],
+            ["not-act-security-example", "notDenied"]
           ]
         }
       }
@@ -254,7 +254,7 @@
               "Resource": "*",
               "Condition": {
                 "StringNotLike": {
-                  "aws:UserAgent": "cloud-copilot-*"
+                  "aws:UserAgent": "act-security-*"
                 }
               }
             }
@@ -283,8 +283,8 @@
             }
           ],
           "rows": [
-            ["cloud-copilot-example", "notDenied"],
-            ["not-cloud-copilot-example", "explicitlyDenied"]
+            ["act-security-example", "notDenied"],
+            ["not-act-security-example", "explicitlyDenied"]
           ]
         }
       }

@@ -1,4 +1,4 @@
-# @cloud-copilot/iam-truth
+# @actsecurity/iam-truth
 
 Generate JSON or Markdown truth tables that explain how a single AWS IAM policy behaves across representative scenarios.
 
@@ -59,7 +59,7 @@ Generated request-context values are deterministic synthetic examples. User-prov
 ## API
 
 ```ts
-import { generateTruthTables } from '@cloud-copilot/iam-truth'
+import { generateTruthTables } from '@actsecurity/iam-truth'
 
 const result = await generateTruthTables({
   policy,

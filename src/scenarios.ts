@@ -340,7 +340,7 @@ export function firstNonMatchingLikeValue(patterns: string[]): string {
   const candidates = nonMatchingLikeCandidates(patterns)
   return (
     candidates.find((candidate) => !matchesAnyLikePattern(candidate, patterns)) ??
-    firstDistinctString(patterns, ['does-not-match-cloud-copilot-pattern'])
+    firstDistinctString(patterns, ['does-not-match-act-security-pattern'])
   )
 }
 
@@ -376,7 +376,7 @@ function nonMatchingLikeCandidates(patterns: string[]): string[] {
   return uniqueStrings([
     ...patterns.map((pattern) => `not-${matchingLikeValue(pattern)}`),
     ...patterns.map((pattern) => `${matchingLikeValue(pattern)}-not`),
-    'does-not-match-cloud-copilot-pattern',
+    'does-not-match-act-security-pattern',
     'definitely-not-a-policy-match',
     'zzzz-non-matching-value',
     'x',

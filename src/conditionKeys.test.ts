@@ -51,7 +51,7 @@ describe('shouldIncludeMissingScenario', () => {
       const conditionKey: ExtractedConditionKey = {
         key,
         operators: ['StringEqualsIfExists'],
-        values: ['cloud-copilot-example-value'],
+        values: ['act-security-example-value'],
         paths: [`Statement.Condition.StringEqualsIfExists.${key}`]
       }
 
@@ -95,7 +95,7 @@ describe('shouldIncludeMissingScenario', () => {
       const conditionKey: ExtractedConditionKey = {
         key,
         operators: ['StringEquals'],
-        values: ['cloud-copilot-example-value'],
+        values: ['act-security-example-value'],
         paths: [`Statement.Condition.StringEquals.${key}`]
       }
 
