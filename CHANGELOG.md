@@ -1,3 +1,5 @@
+## [0.1.16](https://github.com/act-security-labs/iam-truth/compare/v0.1.15...v0.1.16) (2026-09-01)
+
 ## [0.1.15](https://github.com/act-security-labs/iam-truth/compare/v0.1.14...v0.1.15) (2026-09-01)
 
 
