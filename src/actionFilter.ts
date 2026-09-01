@@ -1,5 +1,5 @@
-import { actionMatchesPattern } from '@cloud-copilot/iam-expand'
-import { type Statement } from '@cloud-copilot/iam-policy'
+import { actionMatchesPattern } from '@actsecurity/iam-expand'
+import { type Statement } from '@actsecurity/iam-policy'
 
 /**
  * Filters policy statements to those whose Action or NotAction element can apply to a tested action.

@@ -1,11 +1,11 @@
-import { singleValueArgument, type CustomArgument } from '@cloud-copilot/cli'
+import { singleValueArgument, type CustomArgument } from '@actsecurity/cli'
 import { stat, readFile } from 'fs/promises'
 import { type JsonPolicyDocument, type PolicyFileInput } from './types.js'
 
 /**
  * Creates an optional CLI argument that reads and validates a JSON policy file.
  *
- * @returns A custom `@cloud-copilot/cli` argument for optional policy file input.
+ * @returns A custom `@actsecurity/cli` argument for optional policy file input.
  */
 export function policyJsonFileArgument(): CustomArgument<PolicyFileInput | undefined> {
   return singleValueArgument<PolicyFileInput>(async (path) => {

@@ -1,5 +1,5 @@
-import { expandIamActions, invertIamActions } from '@cloud-copilot/iam-expand'
-import { loadPolicy } from '@cloud-copilot/iam-policy'
+import { expandIamActions, invertIamActions } from '@actsecurity/iam-expand'
+import { loadPolicy } from '@actsecurity/iam-policy'
 import {
   type JsonPolicyDocument,
   type TruthTableDiagnostic,

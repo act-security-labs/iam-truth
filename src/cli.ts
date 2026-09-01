@@ -7,7 +7,7 @@ import {
   readStdin,
   stringArrayArgument,
   stringArgument
-} from '@cloud-copilot/cli'
+} from '@actsecurity/cli'
 import { generateTruthTables } from './generateTruthTables.js'
 import { parseJsonPolicyDocument, policyJsonFileArgument } from './jsonFileArgument.js'
 import { renderTruthTablesMarkdown } from './markdown.js'

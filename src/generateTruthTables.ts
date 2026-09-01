@@ -3,7 +3,7 @@ import {
   validateResourceControlPolicy,
   validateServiceControlPolicy,
   type ValidationError
-} from '@cloud-copilot/iam-policy'
+} from '@actsecurity/iam-policy'
 import { statementsApplicableToAction } from './actionFilter.js'
 import { extractConditionKeysFromStatements } from './conditionKeys.js'
 import { policyEffectMode } from './effectMode.js'

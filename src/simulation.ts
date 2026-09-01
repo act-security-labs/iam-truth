@@ -2,7 +2,7 @@ import {
   runSimulation,
   type RunSimulationResults,
   type Simulation
-} from '@cloud-copilot/iam-simulate'
+} from '@actsecurity/iam-simulate'
 import { policyHasAllowStatement } from './effectMode.js'
 import { type BaselineRequest } from './requestDefaults.js'
 import { type GeneratedScenario } from './scenarios.js'
