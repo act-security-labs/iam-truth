@@ -1,4 +1,4 @@
-import { loadPolicy } from '@cloud-copilot/iam-policy'
+import { loadPolicy } from '@actsecurity/iam-policy'
 import { type JsonPolicyDocument, type TruthTablePolicyEffectMode } from './types.js'
 
 /**

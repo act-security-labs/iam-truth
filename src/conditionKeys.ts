@@ -1,6 +1,6 @@
-import { findConditionKey } from '@cloud-copilot/iam-data'
-import { loadPolicy, type Statement } from '@cloud-copilot/iam-policy'
-import { isAwsResourceInfoExcludedAction } from '@cloud-copilot/iam-utils'
+import { findConditionKey } from '@actsecurity/iam-data'
+import { loadPolicy, type Statement } from '@actsecurity/iam-policy'
+import { isAwsResourceInfoExcludedAction } from '@actsecurity/iam-utils'
 import {
   globalConditionKeyScenarioMetadata,
   type GlobalConditionKeyScenarioMetadata

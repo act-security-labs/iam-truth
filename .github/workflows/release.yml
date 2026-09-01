@@ -23,9 +23,10 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
-          node-version: '22.14.0'
+          node-version: '26.8.1'
 
       - name: Run semantic-release
+        id: semantic_release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |

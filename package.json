@@ -1,10 +1,10 @@
 {
-  "name": "@cloud-copilot/iam-truth",
+  "name": "@actsecurity/iam-truth",
   "version": "0.1.14",
   "description": "Generate truth tables that explain AWS IAM policy behavior",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/cloud-copilot/iam-truth.git"
+    "url": "git+https://github.com/act-security-labs/iam-truth.git"
   },
   "exports": {
     ".": {
@@ -33,22 +33,22 @@
     "policy",
     "truth-table"
   ],
-  "author": "David Kerber <dave@cloudcopilot.io>",
+  "author": "Act Security",
   "license": "AGPL-3.0-or-later",
   "bugs": {
-    "url": "https://github.com/cloud-copilot/iam-truth/issues"
+    "url": "https://github.com/act-security-labs/iam-truth/issues"
   },
-  "homepage": "https://github.com/cloud-copilot/iam-truth#readme",
+  "homepage": "https://github.com/act-security-labs/iam-truth#readme",
   "dependencies": {
-    "@cloud-copilot/cli": "^0.2.46",
-    "@cloud-copilot/iam-data": ">=0.20.202607211 <1.0.0",
-    "@cloud-copilot/iam-expand": "^0.11.62",
-    "@cloud-copilot/iam-policy": "^0.1.89",
-    "@cloud-copilot/iam-simulate": "^0.1.168",
-    "@cloud-copilot/iam-utils": "^0.1.79"
+    "@actsecurity/cli": "^0.2.46",
+    "@actsecurity/iam-data": ">=0.20.202607211 <1.0.0",
+    "@actsecurity/iam-expand": "^0.11.62",
+    "@actsecurity/iam-policy": "^0.1.89",
+    "@actsecurity/iam-simulate": "^0.1.168",
+    "@actsecurity/iam-utils": "^0.1.79"
   },
   "devDependencies": {
-    "@cloud-copilot/prettier-config": "^0.1.1",
+    "@actsecurity/prettier-config": "^0.1.1",
     "@semantic-release/changelog": "^6.0.3",
     "@semantic-release/commit-analyzer": "^13.0.1",
     "@semantic-release/git": "^10.0.1",
@@ -61,7 +61,7 @@
     "typescript": "^5.5.4",
     "vitest": "^4.0.18"
   },
-  "prettier": "@cloud-copilot/prettier-config",
+  "prettier": "@actsecurity/prettier-config",
   "release": {
     "branches": [
       "main"

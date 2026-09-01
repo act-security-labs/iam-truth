@@ -1,5 +1,5 @@
-import { iamActionDetails, iamResourceTypeDetails } from '@cloud-copilot/iam-data'
-import { resourceStringMatchesResourceTypePattern } from '@cloud-copilot/iam-utils'
+import { iamActionDetails, iamResourceTypeDetails } from '@actsecurity/iam-data'
+import { resourceStringMatchesResourceTypePattern } from '@actsecurity/iam-utils'
 import { type TruthTableSupportedResourceType, type TruthTableUntestedResource } from './types.js'
 
 /** Result of validating requested resources against IAM action metadata. */

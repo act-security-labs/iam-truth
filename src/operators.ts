@@ -1,4 +1,4 @@
-import { loadPolicy } from '@cloud-copilot/iam-policy'
+import { loadPolicy } from '@actsecurity/iam-policy'
 import { type JsonPolicyDocument, type TruthTableDiagnostic } from './types.js'
 
 const supportedBaseOperators = new Set([
