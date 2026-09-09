@@ -37,6 +37,18 @@ const DEFAULT_SCENARIO_METADATA_REQUEST_CONTEXT: ScenarioMetadataRequestContext 
   resource: '*'
 }
 
+/** Values and source locations for one operator used with a policy condition key. */
+export interface ExtractedConditionKeyOperatorEntry {
+  /** Condition operator used with the condition key. */
+  operator: string
+
+  /** Condition values referenced by this key under the operator. */
+  values: string[]
+
+  /** Policy paths where the condition key appears under the operator. */
+  paths: string[]
+}
+
 /** Internal representation of a policy condition key and the values referenced in the policy. */
 export interface ExtractedConditionKey {
   /** Condition key as written in the policy. */
@@ -50,6 +62,9 @@ export interface ExtractedConditionKey {
 
   /** Policy paths where the condition key appears. */
   paths: string[]
+
+  /** Values and paths grouped by the operator that references this key. */
+  operatorEntries?: ExtractedConditionKeyOperatorEntry[]
 }
 
 /** Metadata used to generate scenario values for a condition key. */
@@ -97,23 +112,73 @@ export function extractConditionKeysFromStatements(
     for (const condition of statement.conditions()) {
       const key = condition.conditionKey()
       const mapKey = key.toLowerCase()
+      const operator = condition.operation().value()
       const existing = keys.get(mapKey) ?? {
         key,
         operators: [],
         values: [],
-        paths: []
+        paths: [],
+        operatorEntries: []
       }
-      existing.operators.push(condition.operation().value())
-      existing.values.push(...condition.conditionValues())
-      existing.paths.push(condition.keyPath())
+      const operatorEntries = updateOperatorEntries(existing.operatorEntries ?? [], {
+        operator,
+        values: condition.conditionValues(),
+        path: condition.keyPath()
+      })
       keys.set(mapKey, {
         ...existing,
-        operators: [...new Set(existing.operators)],
-        values: [...new Set(existing.values)]
+        operators: operatorEntries.map((entry) => entry.operator),
+        values: uniqueStrings(operatorEntries.flatMap((entry) => entry.values)),
+        paths: uniqueStrings(operatorEntries.flatMap((entry) => entry.paths)),
+        operatorEntries
       })
     }
   }
   return [...keys.values()]
+}
+
+/**
+ * Adds condition values and paths to the matching operator entry, preserving first encounter order.
+ *
+ * @param entries - Existing operator entries for a condition key.
+ * @param update - Operator, values, and path from one policy condition occurrence.
+ * @returns Updated operator entries with duplicate values and paths removed.
+ */
+function updateOperatorEntries(
+  entries: ExtractedConditionKeyOperatorEntry[],
+  update: { operator: string; values: string[]; path: string }
+): ExtractedConditionKeyOperatorEntry[] {
+  const existingIndex = entries.findIndex((entry) => entry.operator === update.operator)
+  if (existingIndex === -1) {
+    return [
+      ...entries,
+      {
+        operator: update.operator,
+        values: uniqueStrings(update.values),
+        paths: [update.path]
+      }
+    ]
+  }
+
+  return entries.map((entry, index) =>
+    index === existingIndex
+      ? {
+          ...entry,
+          values: uniqueStrings([...entry.values, ...update.values]),
+          paths: uniqueStrings([...entry.paths, update.path])
+        }
+      : entry
+  )
+}
+
+/**
+ * Removes duplicate strings while preserving encounter order.
+ *
+ * @param values - String values to de-duplicate.
+ * @returns Unique strings in encounter order.
+ */
+function uniqueStrings(values: string[]): string[] {
+  return [...new Set(values)]
 }
 
 /**

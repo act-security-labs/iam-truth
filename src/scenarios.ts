@@ -1,6 +1,7 @@
 import {
   type ConditionKeyScenarioMetadata,
   type ExtractedConditionKey,
+  type ExtractedConditionKeyOperatorEntry,
   metadataForConditionKey,
   type ScenarioMetadataRequestContext
 } from './conditionKeys.js'
@@ -103,8 +104,86 @@ export function valuesForConditionKey(
   metadata: ConditionKeyScenarioMetadata,
   options?: Pick<ScenarioGenerationOptions, 'showExamplesForAllPolicyValues'>
 ): ScenarioValue[] {
+  const operatorEntries = operatorEntriesForScenarioGeneration(conditionKey)
+  const orderedOperatorEntries = orderMixedNullOperatorEntries(operatorEntries)
+  const hasNonNullOperators = orderedOperatorEntries.some((entry) => !isNullOperatorEntry(entry))
+  const values = orderedOperatorEntries.flatMap((entry) => {
+    const entryValues = valuesForConditionKeyOperator(conditionKey, entry, metadata, options)
+    return hasNonNullOperators && isNullOperatorEntry(entry)
+      ? entryValues.filter((value) => value.contextValue === undefined)
+      : entryValues
+  })
+  return uniqueScenarioValues(values)
+}
+
+/**
+ * Resolves operator-specific condition values for scenario generation.
+ *
+ * @param conditionKey - Extracted condition-key policy values.
+ * @returns Operator entries preserving which values belong to which operator.
+ */
+function operatorEntriesForScenarioGeneration(
+  conditionKey: ExtractedConditionKey
+): ExtractedConditionKeyOperatorEntry[] {
+  if (conditionKey.operatorEntries && conditionKey.operatorEntries.length > 0) {
+    return conditionKey.operatorEntries
+  }
+  return [
+    {
+      operator: conditionKey.operators[0] ?? 'StringEquals',
+      values: conditionKey.values,
+      paths: conditionKey.paths
+    }
+  ]
+}
+
+/**
+ * Orders mixed Null and non-Null operators so concrete present values are generated before absence.
+ *
+ * Concrete non-Null operator values already exercise the key-present case that Null checks for,
+ * so mixed Null entries only need to contribute missing-key examples.
+ *
+ * @param operatorEntries - Operator entries for one condition key.
+ * @returns Operator entries with Null operators moved after non-Null operators when both are present.
+ */
+function orderMixedNullOperatorEntries(
+  operatorEntries: ExtractedConditionKeyOperatorEntry[]
+): ExtractedConditionKeyOperatorEntry[] {
+  const nonNullEntries = operatorEntries.filter((entry) => !isNullOperatorEntry(entry))
+  const nullEntries = operatorEntries.filter(isNullOperatorEntry)
+  if (nonNullEntries.length === 0 || nullEntries.length === 0) {
+    return operatorEntries
+  }
+  return [...nonNullEntries, ...nullEntries]
+}
+
+/**
+ * Checks whether an operator entry uses the Null base operator.
+ *
+ * @param operatorEntry - Operator entry to inspect.
+ * @returns True when the entry uses the Null condition operator.
+ */
+function isNullOperatorEntry(operatorEntry: ExtractedConditionKeyOperatorEntry): boolean {
+  return parseConditionOperator(operatorEntry.operator).baseOperator.toLowerCase() === 'null'
+}
+
+/**
+ * Generates deterministic candidate values for one condition key/operator pairing.
+ *
+ * @param conditionKey - Extracted condition-key policy values.
+ * @param operatorEntry - Operator-specific values to exercise.
+ * @param metadata - Scenario metadata for the key.
+ * @returns Candidate values for scenario generation.
+ */
+function valuesForConditionKeyOperator(
+  conditionKey: ExtractedConditionKey,
+  operatorEntry: ExtractedConditionKeyOperatorEntry,
+  metadata: ConditionKeyScenarioMetadata,
+  options?: Pick<ScenarioGenerationOptions, 'showExamplesForAllPolicyValues'>
+): ScenarioValue[] {
   const values: ScenarioValue[] = []
-  const parsedOperator = parseConditionOperator(conditionKey.operators[0] ?? 'StringEquals')
+  const singleOperatorConditionKey = conditionKeyForOperatorEntry(conditionKey, operatorEntry)
+  const parsedOperator = parseConditionOperator(operatorEntry.operator)
 
   if (metadata.onlyMissing) {
     values.push({ cellValue: null, contextValue: undefined })
@@ -112,29 +191,54 @@ export function valuesForConditionKey(
   }
 
   if (parsedOperator.baseOperator.toLowerCase() === 'null') {
-    values.push(...nullOperatorValues(conditionKey, metadata))
+    values.push(...nullOperatorValues(singleOperatorConditionKey, metadata))
     return uniqueScenarioValues(values)
   }
 
   if (metadata.supportsMultipleValues && parsedOperator.setOperator) {
-    values.push(...multiValueSetOperatorValues(conditionKey, metadata, parsedOperator, options))
+    values.push(
+      ...multiValueSetOperatorValues(singleOperatorConditionKey, metadata, parsedOperator, options)
+    )
     return uniqueScenarioValues(values)
   }
 
   if (metadata.valueType === 'number' && isNumericComparisonOperator(parsedOperator.baseOperator)) {
-    values.push(...numericComparisonValues(conditionKey, options))
+    values.push(...numericComparisonValues(singleOperatorConditionKey, options))
   } else {
-    for (const policyValue of policyValuesForScenarioGeneration(conditionKey, options)) {
+    for (const policyValue of policyValuesForScenarioGeneration(
+      singleOperatorConditionKey,
+      options
+    )) {
       values.push(matchingValueFromString(policyValue, metadata, parsedOperator.baseOperator))
     }
 
-    values.push(alternateValue(conditionKey, metadata, parsedOperator.baseOperator))
+    values.push(alternateValue(singleOperatorConditionKey, metadata, parsedOperator.baseOperator))
   }
   if (metadata.includeMissing) {
     values.push({ cellValue: null, contextValue: undefined })
   }
 
   return uniqueScenarioValues(values)
+}
+
+/**
+ * Narrows an extracted condition key to the values associated with one operator.
+ *
+ * @param conditionKey - Extracted condition-key policy values.
+ * @param operatorEntry - Operator-specific values and paths to keep.
+ * @returns Condition key view containing only one operator's values.
+ */
+function conditionKeyForOperatorEntry(
+  conditionKey: ExtractedConditionKey,
+  operatorEntry: ExtractedConditionKeyOperatorEntry
+): ExtractedConditionKey {
+  return {
+    key: conditionKey.key,
+    operators: [operatorEntry.operator],
+    values: operatorEntry.values,
+    paths: operatorEntry.paths,
+    operatorEntries: [operatorEntry]
+  }
 }
 
 /**

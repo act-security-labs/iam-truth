@@ -1,0 +1,325 @@
+{
+  "description": "Policies that reference one condition key with more than one operator",
+  "cases": [
+    {
+      "name": "generates non-redundant rows for Null false and StringNotEquals on the same key",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Sid": "DenyWithoutExpectedSourceIdentity",
+              "Effect": "Deny",
+              "Action": "s3:PutObject",
+              "Resource": "*",
+              "Condition": {
+                "Null": {
+                  "aws:SourceIdentity": "false"
+                },
+                "StringNotEquals": {
+                  "aws:SourceIdentity": "required-source-identity"
+                }
+              }
+            }
+          ]
+        },
+        "request": {
+          "action": "s3:PutObject"
+        },
+        "options": {
+          "maxRows": 1000
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "columns": [
+            {
+              "key": "aws:SourceIdentity",
+              "label": "aws:SourceIdentity",
+              "valueType": "string"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            ["required-source-identity", "notDenied"],
+            ["bob", "explicitlyDenied"],
+            [null, "notDenied"]
+          ]
+        }
+      }
+    },
+    {
+      "name": "generates non-redundant rows for Null true and StringEqualsIfExists on the same key",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Sid": "DenyMissingOrExpectedSourceIdentity",
+              "Effect": "Deny",
+              "Action": "s3:PutObject",
+              "Resource": "*",
+              "Condition": {
+                "Null": {
+                  "aws:SourceIdentity": "true"
+                },
+                "StringEqualsIfExists": {
+                  "aws:SourceIdentity": "required-source-identity"
+                }
+              }
+            }
+          ]
+        },
+        "request": {
+          "action": "s3:PutObject"
+        },
+        "options": {
+          "maxRows": 1000
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "columns": [
+            {
+              "key": "aws:SourceIdentity",
+              "label": "aws:SourceIdentity",
+              "valueType": "string"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            ["required-source-identity", "notDenied"],
+            ["bob", "notDenied"],
+            [null, "explicitlyDenied"]
+          ]
+        }
+      }
+    },
+    {
+      "name": "generates non-redundant rows for Null false and Bool on the same key",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Sid": "DenySecureTransport",
+              "Effect": "Deny",
+              "Action": "s3:PutObject",
+              "Resource": "*",
+              "Condition": {
+                "Null": {
+                  "aws:SecureTransport": "false"
+                },
+                "Bool": {
+                  "aws:SecureTransport": "true"
+                }
+              }
+            }
+          ]
+        },
+        "request": {
+          "action": "s3:PutObject"
+        },
+        "options": {
+          "maxRows": 1000
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "columns": [
+            {
+              "key": "aws:SecureTransport",
+              "label": "aws:SecureTransport",
+              "valueType": "boolean"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            [true, "explicitlyDenied"],
+            [false, "notDenied"]
+          ]
+        }
+      }
+    },
+    {
+      "name": "generates non-redundant rows for Null false and NumericLessThan on the same key",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Sid": "DenyRecentMfa",
+              "Effect": "Deny",
+              "Action": "s3:PutObject",
+              "Resource": "*",
+              "Condition": {
+                "Null": {
+                  "aws:MultiFactorAuthAge": "false"
+                },
+                "NumericLessThan": {
+                  "aws:MultiFactorAuthAge": "5"
+                }
+              }
+            }
+          ]
+        },
+        "request": {
+          "action": "s3:PutObject"
+        },
+        "options": {
+          "maxRows": 1000
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "columns": [
+            {
+              "key": "aws:MultiFactorAuthAge",
+              "label": "aws:MultiFactorAuthAge",
+              "valueType": "number"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            [4, "explicitlyDenied"],
+            [5, "notDenied"],
+            [6, "notDenied"],
+            [null, "notDenied"]
+          ]
+        }
+      }
+    },
+    {
+      "name": "generates non-redundant rows for Null false and StringLike on the same key",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Sid": "DenyMatchingUserAgent",
+              "Effect": "Deny",
+              "Action": "s3:PutObject",
+              "Resource": "*",
+              "Condition": {
+                "Null": {
+                  "aws:UserAgent": "false"
+                },
+                "StringLike": {
+                  "aws:UserAgent": "act-security-*"
+                }
+              }
+            }
+          ]
+        },
+        "request": {
+          "action": "s3:PutObject"
+        },
+        "options": {
+          "maxRows": 1000
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "columns": [
+            {
+              "key": "aws:UserAgent",
+              "label": "aws:UserAgent",
+              "valueType": "string"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            ["act-security-example", "explicitlyDenied"],
+            ["not-act-security-example", "notDenied"]
+          ]
+        }
+      }
+    },
+    {
+      "name": "generates non-redundant rows for Null false and ForAnyValue StringEquals on the same key",
+      "input": {
+        "policyType": "scp",
+        "policy": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Sid": "DenyMatchingPrincipalOrgPath",
+              "Effect": "Deny",
+              "Action": "s3:PutObject",
+              "Resource": "*",
+              "Condition": {
+                "Null": {
+                  "aws:PrincipalOrgPaths": "false"
+                },
+                "ForAnyValue:StringEquals": {
+                  "aws:PrincipalOrgPaths": "o-example/r-root/ou-example/"
+                }
+              }
+            }
+          ]
+        },
+        "request": {
+          "action": "s3:PutObject"
+        },
+        "options": {
+          "maxRows": 1000
+        }
+      },
+      "expected": {
+        "resultType": "success",
+        "table": {
+          "columns": [
+            {
+              "key": "aws:PrincipalOrgPaths",
+              "label": "Principal Org Paths",
+              "valueType": "string"
+            },
+            {
+              "key": "result",
+              "label": "Result",
+              "valueType": "result"
+            }
+          ],
+          "rows": [
+            [["o-otherorg/r-root/ou-root-sandbox/"], "notDenied"],
+            [
+              ["o-example/r-root/ou-example/", "o-otherorg/r-root/ou-root-sandbox/"],
+              "explicitlyDenied"
+            ],
+            [["o-example/r-root/ou-example/"], "explicitlyDenied"]
+          ]
+        }
+      }
+    }
+  ]
+}

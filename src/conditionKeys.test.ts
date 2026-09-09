@@ -1,10 +1,116 @@
 import { describe, expect, it } from 'vitest'
 import {
+  extractConditionKeys,
   shouldIncludeMissingScenario,
   shouldOnlyGenerateMissingScenario,
   supportsMultipleValuesForIamType,
   type ExtractedConditionKey
 } from './conditionKeys.js'
+
+describe('extractConditionKeys', () => {
+  it('should group condition values by operator for the same condition key', () => {
+    //Given two operators reference the same condition key
+    const policy = {
+      Statement: [
+        {
+          Effect: 'Deny',
+          Action: 's3:PutObject',
+          Resource: '*',
+          Condition: {
+            Null: {
+              'aws:SourceIdentity': 'false'
+            },
+            StringNotEquals: {
+              'aws:SourceIdentity': 'required-source-identity'
+            }
+          }
+        }
+      ]
+    }
+
+    //When condition keys are extracted
+    const result = extractConditionKeys(policy)
+
+    //Then the flattened fields and per-operator fields should preserve the policy values
+    expect(result).toEqual([
+      {
+        key: 'aws:SourceIdentity',
+        operators: ['Null', 'StringNotEquals'],
+        values: ['false', 'required-source-identity'],
+        paths: [
+          'Statement[0].Condition.Null.#aws:SourceIdentity',
+          'Statement[0].Condition.StringNotEquals.#aws:SourceIdentity'
+        ],
+        operatorEntries: [
+          {
+            operator: 'Null',
+            values: ['false'],
+            paths: ['Statement[0].Condition.Null.#aws:SourceIdentity']
+          },
+          {
+            operator: 'StringNotEquals',
+            values: ['required-source-identity'],
+            paths: ['Statement[0].Condition.StringNotEquals.#aws:SourceIdentity']
+          }
+        ]
+      }
+    ])
+  })
+
+  it('should merge duplicate operator values for the same condition key', () => {
+    //Given the same operator references one condition key in multiple statements
+    const policy = {
+      Statement: [
+        {
+          Effect: 'Deny',
+          Action: 's3:PutObject',
+          Resource: '*',
+          Condition: {
+            StringNotEquals: {
+              'aws:SourceIdentity': ['first-source-identity', 'second-source-identity']
+            }
+          }
+        },
+        {
+          Effect: 'Deny',
+          Action: 's3:DeleteObject',
+          Resource: '*',
+          Condition: {
+            StringNotEquals: {
+              'aws:SourceIdentity': ['second-source-identity', 'third-source-identity']
+            }
+          }
+        }
+      ]
+    }
+
+    //When condition keys are extracted
+    const result = extractConditionKeys(policy)
+
+    //Then one operator entry should contain the de-duplicated union of values
+    expect(result).toEqual([
+      {
+        key: 'aws:SourceIdentity',
+        operators: ['StringNotEquals'],
+        values: ['first-source-identity', 'second-source-identity', 'third-source-identity'],
+        paths: [
+          'Statement[0].Condition.StringNotEquals.#aws:SourceIdentity',
+          'Statement[1].Condition.StringNotEquals.#aws:SourceIdentity'
+        ],
+        operatorEntries: [
+          {
+            operator: 'StringNotEquals',
+            values: ['first-source-identity', 'second-source-identity', 'third-source-identity'],
+            paths: [
+              'Statement[0].Condition.StringNotEquals.#aws:SourceIdentity',
+              'Statement[1].Condition.StringNotEquals.#aws:SourceIdentity'
+            ]
+          }
+        ]
+      }
+    ])
+  })
+})
 
 describe('shouldIncludeMissingScenario', () => {
   it('should not include missing scenarios for global keys declared as always present', () => {

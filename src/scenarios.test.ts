@@ -227,6 +227,395 @@ describe('generateScenarios', () => {
     ])
   })
 
+  it('should generate non-redundant values when Null appears before another operator on the same key', async () => {
+    //Given one condition key constrained by both Null and StringNotEquals operators
+    const conditionKeys = extractConditionKeys({
+      Statement: [
+        {
+          Effect: 'Deny',
+          Action: 's3:PutObject',
+          Resource: '*',
+          Condition: {
+            Null: {
+              'aws:SourceIdentity': 'false'
+            },
+            StringNotEquals: {
+              'aws:SourceIdentity': 'required-source-identity'
+            }
+          }
+        }
+      ]
+    })
+
+    expect(conditionKeys[0]?.operators).toEqual(['Null', 'StringNotEquals'])
+
+    //When scenarios are generated
+    const result = await generateScenarios(conditionKeys)
+
+    //Then concrete operator values should exercise presence without an extra Null-present placeholder
+    expect(result.scenarios.map((scenario) => scenario.cells)).toEqual([
+      { 'aws:SourceIdentity': 'required-source-identity' },
+      { 'aws:SourceIdentity': 'bob' },
+      { 'aws:SourceIdentity': null }
+    ])
+    expect(result.scenarios.map((scenario) => scenario.context)).toEqual([
+      { 'aws:SourceIdentity': 'required-source-identity' },
+      { 'aws:SourceIdentity': 'bob' },
+      {}
+    ])
+  })
+
+  it('should keep the same mixed-operator order when Null appears after another operator', async () => {
+    //Given one condition key constrained by StringNotEquals before Null
+    const conditionKeys = extractConditionKeys({
+      Statement: [
+        {
+          Effect: 'Deny',
+          Action: 's3:PutObject',
+          Resource: '*',
+          Condition: {
+            StringNotEquals: {
+              'aws:SourceIdentity': 'required-source-identity'
+            },
+            Null: {
+              'aws:SourceIdentity': 'false'
+            }
+          }
+        }
+      ]
+    })
+
+    expect(conditionKeys[0]?.operators).toEqual(['StringNotEquals', 'Null'])
+
+    //When scenarios are generated
+    const result = await generateScenarios(conditionKeys)
+
+    //Then the normalized mixed-operator order should still place concrete values before missing
+    expect(result.scenarios.map((scenario) => scenario.cells)).toEqual([
+      { 'aws:SourceIdentity': 'required-source-identity' },
+      { 'aws:SourceIdentity': 'bob' },
+      { 'aws:SourceIdentity': null }
+    ])
+  })
+
+  it('should not add a Null-present placeholder for Null true combined with StringEquals', async () => {
+    //Given Null true and StringEquals reference the same condition key
+    const conditionKeys = extractConditionKeys({
+      Statement: [
+        {
+          Effect: 'Deny',
+          Action: 's3:PutObject',
+          Resource: '*',
+          Condition: {
+            Null: {
+              'aws:SourceIdentity': 'true'
+            },
+            StringEquals: {
+              'aws:SourceIdentity': 'required-source-identity'
+            }
+          }
+        }
+      ]
+    })
+
+    //When scenarios are generated
+    const result = await generateScenarios(conditionKeys)
+
+    //Then StringEquals values should cover present states and Null should only add missing
+    expect(result.scenarios.map((scenario) => scenario.cells)).toEqual([
+      { 'aws:SourceIdentity': 'required-source-identity' },
+      { 'aws:SourceIdentity': 'bob' },
+      { 'aws:SourceIdentity': null }
+    ])
+  })
+
+  it('should preserve Null-only scenarios when both Null polarities reference the same key', async () => {
+    //Given only Null operators reference the same condition key across statements
+    const conditionKeys = extractConditionKeys({
+      Statement: [
+        {
+          Effect: 'Deny',
+          Action: 's3:PutObject',
+          Resource: '*',
+          Condition: {
+            Null: {
+              'aws:SourceIdentity': 'true'
+            }
+          }
+        },
+        {
+          Effect: 'Deny',
+          Action: 's3:DeleteObject',
+          Resource: '*',
+          Condition: {
+            Null: {
+              'aws:SourceIdentity': 'false'
+            }
+          }
+        }
+      ]
+    })
+
+    //When scenarios are generated
+    const result = await generateScenarios(conditionKeys)
+
+    //Then missing and present values should still be generated for Null-only usage
+    expect(result.scenarios.map((scenario) => scenario.cells)).toEqual([
+      { 'aws:SourceIdentity': null },
+      { 'aws:SourceIdentity': 'alice' }
+    ])
+  })
+
+  it('should not add a Null-present placeholder for mixed multivalue set operators', async () => {
+    //Given Null false and a set operator reference the same multivalue condition key
+    const conditionKeys = extractConditionKeys({
+      Statement: [
+        {
+          Effect: 'Deny',
+          Action: 's3:PutObject',
+          Resource: '*',
+          Condition: {
+            Null: {
+              'aws:PrincipalOrgPaths': 'false'
+            },
+            'ForAnyValue:StringEquals': {
+              'aws:PrincipalOrgPaths': 'o-example/r-root/ou-example/'
+            }
+          }
+        }
+      ]
+    })
+
+    //When scenarios are generated
+    const result = await generateScenarios(conditionKeys)
+
+    //Then the set-operator arrays should cover present states without an extra Null-present value
+    expect(result.scenarios.map((scenario) => scenario.cells)).toEqual([
+      { 'aws:PrincipalOrgPaths': ['o-otherorg/r-root/ou-root-sandbox/'] },
+      {
+        'aws:PrincipalOrgPaths': [
+          'o-example/r-root/ou-example/',
+          'o-otherorg/r-root/ou-root-sandbox/'
+        ]
+      },
+      { 'aws:PrincipalOrgPaths': ['o-example/r-root/ou-example/'] }
+    ])
+  })
+
+  it('should not add a Null-present placeholder for mixed numeric comparison operators', async () => {
+    //Given Null false and NumericLessThan reference the same numeric condition key
+    const conditionKeys = extractConditionKeys({
+      Statement: [
+        {
+          Effect: 'Deny',
+          Action: 's3:PutObject',
+          Resource: '*',
+          Condition: {
+            Null: {
+              'aws:MultiFactorAuthAge': 'false'
+            },
+            NumericLessThan: {
+              'aws:MultiFactorAuthAge': '5'
+            }
+          }
+        }
+      ]
+    })
+
+    //When scenarios are generated
+    const result = await generateScenarios(conditionKeys)
+
+    //Then numeric boundary values should cover present states and Null should only add missing
+    expect(result.scenarios.map((scenario) => scenario.cells)).toEqual([
+      { 'aws:MultiFactorAuthAge': 4 },
+      { 'aws:MultiFactorAuthAge': 5 },
+      { 'aws:MultiFactorAuthAge': 6 },
+      { 'aws:MultiFactorAuthAge': null }
+    ])
+  })
+
+  it('should not add a Null-present placeholder for mixed boolean operators', async () => {
+    //Given Null false and Bool reference the same boolean condition key
+    const conditionKeys = extractConditionKeys({
+      Statement: [
+        {
+          Effect: 'Deny',
+          Action: 's3:PutObject',
+          Resource: '*',
+          Condition: {
+            Null: {
+              'aws:SecureTransport': 'false'
+            },
+            Bool: {
+              'aws:SecureTransport': 'true'
+            }
+          }
+        }
+      ]
+    })
+
+    //When scenarios are generated
+    const result = await generateScenarios(conditionKeys)
+
+    //Then boolean values should cover present states without an extra Null-present value
+    expect(result.scenarios.map((scenario) => scenario.cells)).toEqual([
+      { 'aws:SecureTransport': true },
+      { 'aws:SecureTransport': false }
+    ])
+  })
+
+  it('should not add a Null-present placeholder for mixed IfExists operators', async () => {
+    //Given Null true and StringEqualsIfExists reference the same condition key
+    const conditionKeys = extractConditionKeys({
+      Statement: [
+        {
+          Effect: 'Deny',
+          Action: 's3:PutObject',
+          Resource: '*',
+          Condition: {
+            Null: {
+              'aws:SourceIdentity': 'true'
+            },
+            StringEqualsIfExists: {
+              'aws:SourceIdentity': 'required-source-identity'
+            }
+          }
+        }
+      ]
+    })
+
+    //When scenarios are generated
+    const result = await generateScenarios(conditionKeys)
+
+    //Then IfExists values should cover present states and keep the missing scenario
+    expect(result.scenarios.map((scenario) => scenario.cells)).toEqual([
+      { 'aws:SourceIdentity': 'required-source-identity' },
+      { 'aws:SourceIdentity': 'bob' },
+      { 'aws:SourceIdentity': null }
+    ])
+  })
+
+  it('should generate every requested policy value for mixed operators', async () => {
+    //Given Null false and StringEquals with multiple policy values reference the same condition key
+    const conditionKeys = extractConditionKeys({
+      Statement: [
+        {
+          Effect: 'Deny',
+          Action: 's3:PutObject',
+          Resource: '*',
+          Condition: {
+            Null: {
+              'aws:SourceIdentity': 'false'
+            },
+            StringEquals: {
+              'aws:SourceIdentity': ['first-source-identity', 'second-source-identity']
+            }
+          }
+        }
+      ]
+    })
+
+    //When scenarios are generated with all policy value examples shown
+    const result = await generateScenarios(conditionKeys, {
+      showExamplesForAllPolicyValues: true
+    })
+
+    //Then both policy values should be generated without a redundant Null-present placeholder
+    expect(result.scenarios.map((scenario) => scenario.cells)).toEqual([
+      { 'aws:SourceIdentity': 'first-source-identity' },
+      { 'aws:SourceIdentity': 'second-source-identity' },
+      { 'aws:SourceIdentity': 'bob' },
+      { 'aws:SourceIdentity': null }
+    ])
+  })
+
+  it('should not add a Null-present placeholder for mixed Like operators', async () => {
+    //Given Null false and StringLike reference the same always-present string condition key
+    const conditionKeys = extractConditionKeys({
+      Statement: [
+        {
+          Effect: 'Deny',
+          Action: 's3:PutObject',
+          Resource: '*',
+          Condition: {
+            Null: {
+              'aws:UserAgent': 'false'
+            },
+            StringLike: {
+              'aws:UserAgent': 'act-security-*'
+            }
+          }
+        }
+      ]
+    })
+
+    //When scenarios are generated
+    const result = await generateScenarios(conditionKeys)
+
+    //Then Like values should cover present states without an extra Null-present value
+    expect(result.scenarios.map((scenario) => scenario.cells)).toEqual([
+      { 'aws:UserAgent': 'act-security-example' },
+      { 'aws:UserAgent': 'not-act-security-example' }
+    ])
+  })
+
+  it('should not add a Null-present placeholder for mixed date comparison operators', async () => {
+    //Given Null false and DateGreaterThan reference the same date condition key
+    const conditionKeys = extractConditionKeys({
+      Statement: [
+        {
+          Effect: 'Deny',
+          Action: 's3:PutObject',
+          Resource: '*',
+          Condition: {
+            Null: {
+              'aws:CurrentTime': 'false'
+            },
+            DateGreaterThan: {
+              'aws:CurrentTime': '2024-01-01T00:00:00Z'
+            }
+          }
+        }
+      ]
+    })
+
+    //When scenarios are generated
+    const result = await generateScenarios(conditionKeys)
+
+    //Then date comparison values should cover present states without an extra Null-present value
+    expect(result.scenarios.map((scenario) => scenario.cells)).toEqual([
+      { 'aws:CurrentTime': '2024-01-02T00:00:00.000Z' },
+      { 'aws:CurrentTime': '2023-12-31T00:00:00.000Z' }
+    ])
+  })
+
+  it('should generate present then missing scenarios for Null false operators', async () => {
+    //Given a Null operator that checks whether a context key is present
+    const conditionKeys = extractConditionKeys({
+      Statement: [
+        {
+          Effect: 'Deny',
+          Action: 's3:PutObject',
+          Resource: '*',
+          Condition: {
+            Null: {
+              'aws:SourceIdentity': 'false'
+            }
+          }
+        }
+      ]
+    })
+
+    //When scenarios are generated
+    const result = await generateScenarios(conditionKeys)
+
+    //Then present and missing scenarios should be generated for standalone Null false usage
+    expect(result.scenarios.map((scenario) => scenario.cells)).toEqual([
+      { 'aws:SourceIdentity': 'alice' },
+      { 'aws:SourceIdentity': null }
+    ])
+  })
+
   it('should generate boolean present values for Null operators on boolean keys', async () => {
     //Given a Null operator that checks whether a boolean context key is absent
     const conditionKeys = extractConditionKeys({
