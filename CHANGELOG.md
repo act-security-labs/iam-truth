@@ -1,3 +1,10 @@
+## [0.1.17](https://github.com/act-security-labs/iam-truth/compare/v0.1.16...v0.1.17) (2026-09-09)
+
+
+### Bug Fixes
+
+* handle multiple operators for same condition key ([d5c4287](https://github.com/act-security-labs/iam-truth/commit/d5c42876bf0bd9576a7cb3bdcb1f7db18bb779b6))
+
 ## [0.1.16](https://github.com/act-security-labs/iam-truth/compare/v0.1.15...v0.1.16) (2026-09-01)
 
 ## [0.1.15](https://github.com/act-security-labs/iam-truth/compare/v0.1.14...v0.1.15) (2026-09-01)
