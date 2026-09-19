@@ -1,3 +1,10 @@
+## [0.1.18](https://github.com/act-security-labs/iam-truth/compare/v0.1.17...v0.1.18) (2026-09-19)
+
+
+### Bug Fixes
+
+* use updated dependency updater action ([46d8c5e](https://github.com/act-security-labs/iam-truth/commit/46d8c5e3a12fc05852eca832b0253c842270e06c))
+
 ## [0.1.17](https://github.com/act-security-labs/iam-truth/compare/v0.1.16...v0.1.17) (2026-09-09)
 
 
