@@ -1,6 +1,6 @@
 {
   "name": "@actsecurity/iam-truth",
-  "version": "0.1.18",
+  "version": "0.1.19",
   "description": "Generate truth tables that explain AWS IAM policy behavior",
   "repository": {
     "type": "git",
