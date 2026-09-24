@@ -1,3 +1,10 @@
+## [0.1.20](https://github.com/act-security-labs/iam-truth/compare/v0.1.19...v0.1.20) (2026-09-24)
+
+
+### Bug Fixes
+
+* run PR checks safely for fork contributions ([09d654a](https://github.com/act-security-labs/iam-truth/commit/09d654a3f0ee3a562fdbfb1d9f36fe0d656eaa66))
+
 ## [0.1.19](https://github.com/act-security-labs/iam-truth/compare/v0.1.18...v0.1.19) (2026-09-19)
 
 ## [0.1.18](https://github.com/act-security-labs/iam-truth/compare/v0.1.17...v0.1.18) (2026-09-19)
