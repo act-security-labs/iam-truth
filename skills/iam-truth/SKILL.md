@@ -20,7 +20,8 @@ npx -y @actsecurity/iam-truth@latest --policy-type rcp --file rcp.json --action 
 Point it at the user's question. The defaults answer a generic one: action is the first expanded action of the first statement, resource is `*`, principal is a test role.
 
 - `--action`: the request being evaluated.
-- `--resources` (repeatable): each extra resource multiplies the rows; `--simplify` collapses to `Any` where the resource does not change the outcome.
+- `--resources` (repeatable): each extra resource multiplies the rows.
+- `--simplify`: show which conditions decide the outcome (see below).
 - `--principal`: matters for RCPs and for conditions on principal keys.
 
 `--help` is the authoritative flag list. Only what it does not say is below.
@@ -31,7 +32,8 @@ Point it at the user's question. The defaults answer a generic one: action is th
 - **`--output md` is for the user, `json` for you.** Show the Markdown table exactly as printed, then interpret below it; a table you rewrite or merge from several runs is no longer the tool's evidence.
 - **Rows are synthetic examples.** The tool takes condition values from the policy and generates matching and non-matching values (sample account IDs, org IDs, regions such as `us-other-2`). A row does not claim that request exists in the user's account, and there is no flag to pin a request context key such as a specific region.
 - **`resultType` is the answer even when it is not `success`.** `invalidPolicy`, `unsupportedConditionKeys`, `tooManyRows`, `noTestableResources` and the rest carry `diagnostics[]` with `code`, `message`, and often `path` or `conditionKey`. Relay them; they say what the tool cannot model.
-- **Row explosion.** Scenarios are the Cartesian product of condition values across keys, times resources. On `tooManyRows` or an unreadable table, narrow with `--action` and fewer `--resources`, then `--simplify`. `-a` gives one row per policy value instead of one representative row.
+- **`--simplify` is about clarity, not fewer rows.** It finds the conditions that decide the outcome and writes `Any` in the columns that do not matter for that row. If a Deny fires when `aws:SecureTransport` is `false`, the region and tag columns of that row become `Any`, because no value there changes the result. Use it when the user asks why a request is denied or what actually matters; use the full table when they need every combination spelled out. The same toggle exists in the web version at https://act.security/amphi/iam-truth.
+- **Row explosion.** Scenarios are the Cartesian product of condition values across keys, times resources. On `tooManyRows` or an unreadable table, narrow with `--action` and fewer `--resources`. `-a` gives one row per policy value instead of one representative row.
 - **Skipped resources go to stderr** with a `RESOURCE_UNSUPPORTED_FOR_ACTION` diagnostic; capture stderr and mention them.
 - **Stale catalog.** `iam-truth` has no `--show-data-version`; if freshness matters, ask `npx -y @actsecurity/iam-expand@latest --show-data-version`, and refresh with `npx -y -p @actsecurity/iam-data@latest -p @actsecurity/iam-truth@latest iam-truth`.
 
