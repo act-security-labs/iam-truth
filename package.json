@@ -45,7 +45,7 @@
     "@actsecurity/iam-expand": "^0.11.62",
     "@actsecurity/iam-policy": "^0.1.89",
     "@actsecurity/iam-simulate": "^0.1.168",
-    "@actsecurity/iam-utils": "^0.1.79"
+    "@actsecurity/iam-utils": "^0.1.96"
   },
   "devDependencies": {
     "@actsecurity/prettier-config": "^0.1.1",

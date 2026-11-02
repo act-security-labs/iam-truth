@@ -1,3 +1,4 @@
+import { equalsIgnoreCase } from '@actsecurity/iam-utils'
 import {
   type ConditionKeyScenarioMetadata,
   type ExtractedConditionKey,
@@ -164,7 +165,7 @@ function orderMixedNullOperatorEntries(
  * @returns True when the entry uses the Null condition operator.
  */
 function isNullOperatorEntry(operatorEntry: ExtractedConditionKeyOperatorEntry): boolean {
-  return parseConditionOperator(operatorEntry.operator).baseOperator.toLowerCase() === 'null'
+  return equalsIgnoreCase(parseConditionOperator(operatorEntry.operator).baseOperator, 'null')
 }
 
 /**
@@ -190,7 +191,7 @@ function valuesForConditionKeyOperator(
     return uniqueScenarioValues(values)
   }
 
-  if (parsedOperator.baseOperator.toLowerCase() === 'null') {
+  if (equalsIgnoreCase(parsedOperator.baseOperator, 'null')) {
     values.push(...nullOperatorValues(singleOperatorConditionKey, metadata))
     return uniqueScenarioValues(values)
   }
@@ -255,7 +256,7 @@ function matchingValueFromString(
 ): ScenarioValue {
   const operator = baseOperator.toLowerCase()
   if (metadata.valueType === 'boolean') {
-    const boolValue = value.toLowerCase() === 'true'
+    const boolValue = equalsIgnoreCase(value, 'true')
     return { cellValue: boolValue, contextValue: String(boolValue) }
   }
   if (metadata.valueType === 'number') {
@@ -337,7 +338,8 @@ function alternateValue(
 ): ScenarioValue {
   const operator = baseOperator.toLowerCase()
   if (metadata.valueType === 'boolean') {
-    const firstValue = conditionKey.values[0]?.toLowerCase() === 'true'
+    const firstValue =
+      conditionKey.values[0] !== undefined && equalsIgnoreCase(conditionKey.values[0], 'true')
     return { cellValue: !firstValue, contextValue: String(!firstValue) }
   }
   if (metadata.valueType === 'number') {
@@ -567,7 +569,7 @@ function nullOperatorValues(
   conditionKey: ExtractedConditionKey,
   metadata: ConditionKeyScenarioMetadata
 ): ScenarioValue[] {
-  const wantsMissing = conditionKey.values.some((value) => value.toLowerCase() === 'true')
+  const wantsMissing = conditionKey.values.some((value) => equalsIgnoreCase(value, 'true'))
   const presentValue = nullOperatorPresentValue(conditionKey, metadata)
   if (!metadata.includeMissing) {
     return [presentValue]
