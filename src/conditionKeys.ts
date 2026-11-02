@@ -1,6 +1,6 @@
 import { findConditionKey } from '@actsecurity/iam-data'
 import { loadPolicy, type Statement } from '@actsecurity/iam-policy'
-import { isAwsResourceInfoExcludedAction } from '@actsecurity/iam-utils'
+import { equalsIgnoreCase, isAwsResourceInfoExcludedAction } from '@actsecurity/iam-utils'
 import {
   globalConditionKeyScenarioMetadata,
   type GlobalConditionKeyScenarioMetadata
@@ -276,7 +276,7 @@ export function shouldIncludeMissingScenario(
 
   const resourceInfoAvailability = resourceInfoKeyAvailability(conditionKey.key, requestContext)
   if (resourceInfoAvailability === 'present') {
-    return conditionKey.key.toLowerCase() !== 'aws:resourceaccount'
+    return !equalsIgnoreCase(conditionKey.key, 'aws:resourceaccount')
   }
   if (resourceInfoAvailability === 'missing') {
     return true
