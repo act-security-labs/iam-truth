@@ -1,3 +1,11 @@
+## [0.1.31](https://github.com/act-security-labs/iam-truth/compare/v0.1.30...v0.1.31) (2026-11-09)
+
+
+### Bug Fixes
+
+* pin retry-enabled dependency update action ([8577d03](https://github.com/act-security-labs/iam-truth/commit/8577d03b3deb1f0d5abbfb6f2e08f102884618d1))
+* stagger dependency update schedule ([44ca09d](https://github.com/act-security-labs/iam-truth/commit/44ca09d1e5644991ad92cdad9e589bed41b935ee))
+
 ## [0.1.30](https://github.com/act-security-labs/iam-truth/compare/v0.1.29...v0.1.30) (2026-11-08)
 
 ## [0.1.29](https://github.com/act-security-labs/iam-truth/compare/v0.1.28...v0.1.29) (2026-11-02)
